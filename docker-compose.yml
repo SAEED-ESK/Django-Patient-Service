@@ -1,0 +1,40 @@
+services:
+
+  db:
+    container_name: patient_service_db
+    image: postgres:17-alpine
+    volumes:
+      - ./postgre/data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    restart: always
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: dockerfiles/dev/django/Dockerfile
+    container_name: patient_service_backend
+    command: sh -c "python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./core:/app
+    ports:
+      - "8000:8000"
+      - "5678:5678"
+    environment:
+      - SECRET_KEY=test
+      - DEBUG=True
+      - COMINGSOON=False
+      - SHOW_DEBUGGER_TOOLBAR=True
+      - ENABLE_DEBUGPY=True
+    restart: always
+
+    depends_on:
+      - db
+
