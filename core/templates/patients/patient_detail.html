@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        پرونده بیمار {{ patient.id }}
+    </title>
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         عنوان
+         ===================================================== -->
+
+    <h1>
+        پرونده بیمار شماره {{ patient.id }}
+    </h1>
+
+
+    <!-- =====================================================
+         اطلاعات اصلی بیمار
+         ===================================================== -->
+
+    <h2>
+        اطلاعات بیمار
+    </h2>
+
+
+    <p>
+        <strong>سن:</strong>
+        {{ patient.age }}
+    </p>
+
+
+    <p>
+        <strong>جنس:</strong>
+        {{ patient.get_gender_display }}
+    </p>
+
+
+    <p>
+        <strong>تشخیص روان پزشکی:</strong>
+        {{ patient.psychiatric_diagnosis }}
+    </p>
+
+
+    <!-- =====================================================
+         بیماری‌های همراه
+         ===================================================== -->
+
+    <h2>
+        بیماری‌های همراه
+    </h2>
+
+
+    <ul>
+
+        <li>
+            دیابت:
+            {% if patient.diabetes %}
+                دارد
+            {% else %}
+                ندارد
+            {% endif %}
+        </li>
+
+
+        <li>
+            پرفشاری خون:
+            {% if patient.hypertension %}
+                دارد
+            {% else %}
+                ندارد
+            {% endif %}
+        </li>
+
+
+        <li>
+            دیس‌لیپیدمی:
+            {% if patient.dyslipidemia %}
+                دارد
+            {% else %}
+                ندارد
+            {% endif %}
+        </li>
+
+
+        <li>
+            چاقی:
+            {% if patient.obesity %}
+                دارد
+            {% else %}
+                ندارد
+            {% endif %}
+        </li>
+
+
+        <li>
+            بیماری قلبی عروقی:
+            {% if patient.cardiovascular_disease %}
+                دارد
+            {% else %}
+                ندارد
+            {% endif %}
+        </li>
+
+    </ul>
+
+
+    <!-- =====================================================
+         داروها
+         ===================================================== -->
+
+    <h2>
+        داروهای بیمار
+    </h2>
+
+
+    {% if patient.medications.exists %}
+
+        <table border="1" cellpadding="10">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        دارو
+                    </th>
+
+                    <th>
+                        دوز روزانه
+                    </th>
+
+                    <th>
+                        فرم دارویی
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for medication in patient.medications.all %}
+
+                    <tr>
+
+                        <td>
+                            {{ medication.get_drug_display }}
+                        </td>
+
+                        <td>
+                            {{ medication.dose }}
+                        </td>
+
+                        <td>
+                            {{ medication.get_form_display }}
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+
+        {% if patient.is_polypharmacy %}
+
+            <p>
+                <strong>
+                    وضعیت: پلی‌فارماسی
+                </strong>
+            </p>
+
+        {% endif %}
+
+    {% else %}
+
+        <p>
+            دارویی برای این بیمار ثبت نشده است.
+        </p>
+
+    {% endif %}
+
+
+    <!-- =====================================================
+         اطلاعات درمان
+         ===================================================== -->
+
+    <h2>
+        اطلاعات درمان
+    </h2>
+
+
+    <p>
+
+        <strong>
+            تاریخ شروع درمان:
+        </strong>
+
+        {{ patient.treatment_start_date }}
+
+    </p>
+
+
+    <p>
+
+        <strong>
+            آخرین تغییر دارو یا دوز:
+        </strong>
+
+        {{ patient.last_medication_change }}
+
+    </p>
+
+
+    <!-- =====================================================
+         وضعیت پایش
+         ===================================================== -->
+
+    <h2>
+        وضعیت پایش
+    </h2>
+
+
+    <ul>
+
+        <li>
+            وزن / BMI:
+            {{ patient.get_weight_status }}
+        </li>
+
+
+        <li>
+            دور کمر:
+            {{ patient.get_waist_status }}
+        </li>
+
+
+        <li>
+            فشار خون / نبض:
+            {{ patient.get_blood_pressure_status }}
+        </li>
+
+
+        <li>
+            گلوکز / HbA1c:
+            {{ patient.get_glucose_status }}
+        </li>
+
+
+        <li>
+            پروفایل چربی:
+            {{ patient.get_lipid_status }}
+        </li>
+
+
+        <li>
+            پرولاکتین:
+            {{ patient.get_prolactin_status }}
+        </li>
+
+
+        <li>
+            اختلالات حرکتی:
+            {{ patient.get_movement_status }}
+        </li>
+
+
+        <li>
+            ECG:
+            {{ patient.get_ecg_status }}
+        </li>
+
+    </ul>
+
+
+    <!-- =====================================================
+         انطباق کلی
+         ===================================================== -->
+
+    <h2>
+        انطباق کلی
+    </h2>
+
+
+    <p>
+
+        <strong>
+            {{ patient.get_overall_compliance }}
+        </strong>
+
+    </p>
+
+
+    <!-- =====================================================
+         توضیحات
+         ===================================================== -->
+
+    {% if patient.notes %}
+
+        <h2>
+            توضیحات
+        </h2>
+
+        <p>
+            {{ patient.notes }}
+        </p>
+
+    {% endif %}
+
+
+    <!-- =====================================================
+         لینک‌ها
+         ===================================================== -->
+
+    <hr>
+
+    <a href="{% url 'patient-edit' patient.id %}">
+        ویرایش پرونده
+    </a>
+
+    <br>
+    <br>
+
+    <a href="{% url 'patient-delete' patient.id %}">
+        حذف پرونده
+    </a>
+
+    <br>
+    <br>
+
+    <a href="{% url 'patient-list' %}">
+        ← بازگشت به لیست بیماران
+    </a>
+
+
+    <br>
+    <br>
+
+
+    <a href="{% url 'patient-create' %}">
+        + ثبت بیمار جدید
+    </a>
+
+
+</body>
+
+</html>

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        ویرایش بیمار {{ patient.id }}
+    </title>
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         عنوان
+         ===================================================== -->
+
+    <h1>
+        ویرایش پرونده بیمار شماره {{ patient.id }}
+    </h1>
+
+
+    <!-- =====================================================
+         فرم ویرایش
+         ===================================================== -->
+
+    <form method="post">
+
+        {% csrf_token %}
+
+
+        <!-- =================================================
+             خطاهای کلی فرم بیمار
+             ================================================= -->
+
+        {% if form.non_field_errors %}
+
+            <div>
+
+                {{ form.non_field_errors }}
+
+            </div>
+
+        {% endif %}
+
+
+        <!-- =================================================
+             اطلاعات اصلی بیمار
+             ================================================= -->
+
+        <h2>
+            اطلاعات بیمار
+        </h2>
+
+
+        {{ form.as_p }}
+
+
+        <!-- =================================================
+             داروهای بیمار
+             ================================================= -->
+
+        <h2>
+            داروهای بیمار
+        </h2>
+
+
+        {{ medication_formset.management_form }}
+
+
+        {% if medication_formset.non_form_errors %}
+
+            <div>
+
+                {{ medication_formset.non_form_errors }}
+
+            </div>
+
+        {% endif %}
+
+
+        <div id="medication-forms">
+
+
+            {% for medication_form in medication_formset %}
+
+                <div class="medication-form">
+
+                    {{ medication_form.id }}
+
+                    {% if medication_form.non_field_errors %}
+
+                        <div>
+                            {{ medication_form.non_field_errors }}
+                        </div>
+
+                    {% endif %}
+
+
+                    {{ medication_form.as_p }}
+
+
+                    {% if medication_form.instance.pk %}
+
+                        <label>
+
+                            {{ medication_form.DELETE }}
+
+                            حذف این دارو
+
+                        </label>
+
+                    {% endif %}
+
+                </div>
+
+                <hr>
+
+            {% endfor %}
+
+
+        </div>
+
+
+        <!-- =================================================
+             فرم خالی برای اضافه کردن داروی جدید
+             ================================================= -->
+
+        <div
+            id="empty-medication-form"
+            style="display: none;"
+        >
+
+            <div class="medication-form">
+
+                {{ medication_formset.empty_form.as_p }}
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             دکمه اضافه کردن دارو
+             ================================================= -->
+
+        <button
+            type="button"
+            id="add-medication"
+        >
+            + افزودن داروی دیگر
+        </button>
+
+
+        <br>
+        <br>
+
+
+        <!-- =================================================
+             ذخیره تغییرات
+             ================================================= -->
+
+        <button type="submit">
+            ذخیره تغییرات
+        </button>
+
+
+    </form>
+
+
+    <!-- =====================================================
+         لینک‌ها
+         ===================================================== -->
+
+    <hr>
+
+
+    <a href="{% url 'patient-detail' patient.id %}">
+        ← بازگشت به پرونده بیمار
+    </a>
+
+
+    <br>
+    <br>
+
+
+    <a href="{% url 'patient-list' %}">
+        ← بازگشت به لیست بیماران
+    </a>
+
+
+    <!-- =====================================================
+         JavaScript
+         مدیریت فرم‌های دارو
+         ===================================================== -->
+
+    <script>
+
+        const addMedicationButton =
+            document.getElementById("add-medication");
+
+        const medicationFormsContainer =
+            document.getElementById("medication-forms");
+
+        const emptyMedicationForm =
+            document.getElementById("empty-medication-form");
+
+        const totalForms =
+            document.getElementById(
+                "id_medications-TOTAL_FORMS"
+            );
+
+
+        addMedicationButton.addEventListener(
+            "click",
+            function () {
+
+                const formIndex =
+                    parseInt(totalForms.value);
+
+                const formTemplate =
+                    emptyMedicationForm.innerHTML.replaceAll(
+                        "__prefix__",
+                        formIndex
+                    );
+
+                medicationFormsContainer.insertAdjacentHTML(
+                    "beforeend",
+                    formTemplate
+                );
+
+                totalForms.value =
+                    formIndex + 1;
+
+            }
+        );
+
+    </script>
+
+
+</body>
+
+</html>
