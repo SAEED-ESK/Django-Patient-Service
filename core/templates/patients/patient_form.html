@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>ثبت بیمار</title>
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         عنوان صفحه
+         ===================================================== -->
+
+    <h1>
+        ثبت بیمار جدید
+    </h1>
+
+
+    <!-- =====================================================
+         نمایش پیام‌های Django
+         ===================================================== -->
+
+    {% if messages %}
+
+        {% for message in messages %}
+
+            <div>
+                {{ message }}
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
+
+
+
+    <form method="post">
+
+        {% csrf_token %}
+
+
+        <!-- =================================================
+             اطلاعات اصلی بیمار
+             ================================================= -->
+
+        <h2>
+            اطلاعات بیمار
+        </h2>
+
+
+        <!-- خطاهای کلی فرم بیمار -->
+
+        {% if form.non_field_errors %}
+
+            <div>
+
+                {% for error in form.non_field_errors %}
+
+                    <p>
+                        {{ error }}
+                    </p>
+
+                {% endfor %}
+
+            </div>
+
+        {% endif %}
+
+
+        <!-- نمایش تمام فیلدهای PatientForm -->
+
+        {{ form.as_p }}
+
+
+
+        <!-- =================================================
+             داروهای بیمار
+             ================================================= -->
+
+        <h2>
+            داروهای بیمار
+        </h2>
+
+
+        <!--
+            Django برای Formset به این اطلاعات نیاز دارد.
+            این خط بسیار مهم است.
+        -->
+
+        {{ medication_formset.management_form }}
+
+
+        <!-- خطاهای کلی Formset -->
+
+        {% if medication_formset.non_form_errors %}
+
+            <div>
+
+                {% for error in medication_formset.non_form_errors %}
+
+                    <p>
+                        {{ error }}
+                    </p>
+
+                {% endfor %}
+
+            </div>
+
+        {% endif %}
+
+
+
+        <!-- =================================================
+             محل نمایش فرم‌های دارو
+             ================================================= -->
+
+        <div id="medication-forms">
+
+
+            {% for medication_form in medication_formset %}
+
+                <div class="medication-form">
+
+
+                    <h3>
+                        دارو {{ forloop.counter }}
+                    </h3>
+
+
+                    <!--
+                        اگر خود فرم دارو خطایی داشته باشد،
+                        اینجا نمایش داده می‌شود.
+                    -->
+
+                    {% if medication_form.non_field_errors %}
+
+                        <div>
+
+                            {% for error in medication_form.non_field_errors %}
+
+                                <p>
+                                    {{ error }}
+                                </p>
+
+                            {% endfor %}
+
+                        </div>
+
+                    {% endif %}
+
+
+                    <!-- فیلدهای دارو -->
+
+                    {{ medication_form.as_p }}
+
+
+                    <!-- دکمه حذف -->
+
+                    <button
+                        type="button"
+                        class="remove-medication"
+                    >
+                        حذف دارو
+                    </button>
+
+
+                </div>
+
+            {% endfor %}
+
+
+        </div>
+
+
+
+        <!-- =================================================
+             دکمه افزودن دارو
+             ================================================= -->
+
+        <button
+            type="button"
+            id="add-medication"
+        >
+            + افزودن دارو
+        </button>
+
+
+
+        <!-- =================================================
+             فرم خالی برای ساخت داروی جدید
+             
+             این قسمت در صفحه دیده نمی‌شود.
+             JavaScript از آن برای ساخت فرم جدید
+             استفاده می‌کند.
+             ================================================= -->
+
+        <div
+            id="empty-medication-form"
+            style="display: none;"
+        >
+
+            <div class="medication-form">
+
+
+                <h3>
+
+                    دارو
+                    <span class="medication-number"></span>
+
+                </h3>
+
+
+                {{ medication_formset.empty_form.as_p }}
+
+
+                <button
+                    type="button"
+                    class="remove-medication"
+                >
+                    حذف دارو
+                </button>
+
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             دکمه ثبت بیمار
+             ================================================= -->
+
+        <br>
+        <br>
+
+        <button type="submit">
+
+            ثبت بیمار
+
+        </button>
+
+
+    </form>
+
+
+
+    <!-- =====================================================
+         JavaScript
+         مدیریت اضافه / حذف کردن داروها
+         ===================================================== -->
+
+    <script>
+
+
+        // =====================================================
+        // پیدا کردن عناصر صفحه
+        // =====================================================
+
+        const medicationForms =
+            document.getElementById(
+                "medication-forms"
+            );
+
+
+        const addMedicationButton =
+            document.getElementById(
+                "add-medication"
+            );
+
+
+        const totalForms =
+            document.getElementById(
+                "id_medications-TOTAL_FORMS"
+            );
+
+
+        const emptyFormTemplate =
+            document.getElementById(
+                "empty-medication-form"
+            );
+
+
+
+        // =====================================================
+        // اضافه کردن داروی جدید
+        // =====================================================
+
+        addMedicationButton.addEventListener(
+            "click",
+            function () {
+
+
+                // ---------------------------------------------
+                // تعداد فعلی فرم‌های دارو
+                // ---------------------------------------------
+
+                const formIndex =
+                    parseInt(
+                        totalForms.value
+                    );
+
+
+                // ---------------------------------------------
+                // گرفتن HTML فرم خالی
+                // ---------------------------------------------
+
+                let newForm =
+                    emptyFormTemplate.innerHTML;
+
+
+                // ---------------------------------------------
+                // Django در empty_form از __prefix__
+                // استفاده می‌کند.
+                //
+                // آن را با شماره واقعی فرم جایگزین می‌کنیم.
+                // ---------------------------------------------
+
+                newForm =
+                    newForm.replace(
+                        /__prefix__/g,
+                        formIndex
+                    );
+
+
+                // ---------------------------------------------
+                // ساخت یک عنصر موقت
+                // ---------------------------------------------
+
+                const wrapper =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                wrapper.innerHTML =
+                    newForm;
+
+
+                // ---------------------------------------------
+                // شماره داروی جدید
+                // ---------------------------------------------
+
+                const medicationNumber =
+                    medicationForms.children.length + 1;
+
+
+                const numberElement =
+                    wrapper.querySelector(
+                        ".medication-number"
+                    );
+
+
+                if (numberElement) {
+
+                    numberElement.textContent =
+                        medicationNumber;
+
+                }
+
+
+                // ---------------------------------------------
+                // اضافه کردن فرم جدید به صفحه
+                // ---------------------------------------------
+
+                medicationForms.appendChild(
+                    wrapper.firstElementChild
+                );
+
+
+                // ---------------------------------------------
+                // افزایش TOTAL_FORMS
+                //
+                // این کار به Django می‌گوید
+                // چند فرم داریم.
+                // ---------------------------------------------
+
+                totalForms.value =
+                    formIndex + 1;
+
+            }
+        );
+
+
+
+        // =====================================================
+        // حذف دارو
+        // =====================================================
+
+        medicationForms.addEventListener(
+            "click",
+            function (event) {
+
+
+                // اگر روی دکمه حذف کلیک نشده،
+                // کاری انجام نده.
+
+                if (
+                    !event.target.classList.contains(
+                        "remove-medication"
+                    )
+                ) {
+
+                    return;
+
+                }
+
+
+                // ---------------------------------------------
+                // پیدا کردن فرم دارویی که باید حذف شود
+                // ---------------------------------------------
+
+                const medicationForm =
+                    event.target.closest(
+                        ".medication-form"
+                    );
+
+
+                // ---------------------------------------------
+                // حذف فرم از صفحه
+                // ---------------------------------------------
+
+                if (medicationForm) {
+
+                    medicationForm.remove();
+
+                }
+
+            }
+        );
+
+
+    </script>
+
+
+</body>
+
+</html>
