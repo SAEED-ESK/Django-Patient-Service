@@ -1,3 +1,5 @@
+{% load patient_filters %}
+
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 
@@ -17,9 +19,8 @@
 
 <body>
 
-
     <!-- =====================================================
-         عنوان
+         عنوان صفحه
          ===================================================== -->
 
     <h1>
@@ -43,6 +44,234 @@
 
     {% endif %}
 
+
+    <!-- =====================================================
+         جستجوی بیمار
+         ===================================================== -->
+
+    <form method="get">
+
+        <input
+            type="text"
+            name="search"
+            value="{{ request.GET.search|default:'' }}"
+            placeholder="جستجو بر اساس تشخیص روان‌پزشکی"
+        >
+
+        <!--
+        اگر فیلترهای دیگری انتخاب شده باشند،
+        هنگام جستجو آن‌ها را حفظ می‌کنیم.
+        -->
+
+        {% if request.GET.gender %}
+            <input
+                type="hidden"
+                name="gender"
+                value="{{ request.GET.gender }}"
+            >
+        {% endif %}
+
+        {% if request.GET.diabetes %}
+            <input
+                type="hidden"
+                name="diabetes"
+                value="{{ request.GET.diabetes }}"
+            >
+        {% endif %}
+
+        {% if request.GET.hypertension %}
+            <input
+                type="hidden"
+                name="hypertension"
+                value="{{ request.GET.hypertension }}"
+            >
+        {% endif %}
+
+        {% if request.GET.obesity %}
+            <input
+                type="hidden"
+                name="obesity"
+                value="{{ request.GET.obesity }}"
+            >
+        {% endif %}
+
+        {% if request.GET.cardiovascular_disease %}
+            <input
+                type="hidden"
+                name="cardiovascular_disease"
+                value="{{ request.GET.cardiovascular_disease }}"
+            >
+        {% endif %}
+
+
+        <button type="submit">
+            جستجو
+        </button>
+
+
+        {% if request.GET.search %}
+
+            <a href="{% url 'patient-list' %}">
+                حذف جستجو
+            </a>
+
+        {% endif %}
+
+    </form>
+
+
+    <hr>
+
+
+    <!-- =====================================================
+         فیلتر بیماران
+         ===================================================== -->
+
+    <form method="get">
+
+        <!--
+        حفظ عبارت جستجو هنگام اعمال فیلتر
+        -->
+
+        {% if request.GET.search %}
+
+            <input
+                type="hidden"
+                name="search"
+                value="{{ request.GET.search }}"
+            >
+
+        {% endif %}
+
+
+        <!-- =================================================
+             فیلتر جنسیت
+             ================================================= -->
+
+        <label for="gender">
+            جنسیت:
+        </label>
+
+        <select name="gender" id="gender">
+
+            <option value="">
+                همه
+            </option>
+
+            <option
+                value="male"
+                {% if request.GET.gender == "male" %}
+                    selected
+                {% endif %}
+            >
+                مرد
+            </option>
+
+            <option
+                value="female"
+                {% if request.GET.gender == "female" %}
+                    selected
+                {% endif %}
+            >
+                زن
+            </option>
+
+        </select>
+
+
+        <!-- =================================================
+             فیلتر دیابت
+             ================================================= -->
+
+        <label>
+
+            <input
+                type="checkbox"
+                name="diabetes"
+                value="1"
+                {% if request.GET.diabetes == "1" %}
+                    checked
+                {% endif %}
+            >
+
+            دیابت
+
+        </label>
+
+
+        <!-- =================================================
+             فیلتر پرفشاری خون
+             ================================================= -->
+
+        <label>
+
+            <input
+                type="checkbox"
+                name="hypertension"
+                value="1"
+                {% if request.GET.hypertension == "1" %}
+                    checked
+                {% endif %}
+            >
+
+            پرفشاری خون
+
+        </label>
+
+
+        <!-- =================================================
+             فیلتر چاقی
+             ================================================= -->
+
+        <label>
+
+            <input
+                type="checkbox"
+                name="obesity"
+                value="1"
+                {% if request.GET.obesity == "1" %}
+                    checked
+                {% endif %}
+            >
+
+            چاقی
+
+        </label>
+
+
+        <!-- =================================================
+             فیلتر بیماری قلبی عروقی
+             ================================================= -->
+
+        <label>
+
+            <input
+                type="checkbox"
+                name="cardiovascular_disease"
+                value="1"
+                {% if request.GET.cardiovascular_disease == "1" %}
+                    checked
+                {% endif %}
+            >
+
+            بیماری قلبی عروقی
+
+        </label>
+
+
+        <button type="submit">
+            اعمال فیلتر
+        </button>
+
+
+        <a href="{% url 'patient-list' %}">
+            حذف فیلترها
+        </a>
+
+    </form>
+
+
+    <hr>
 
 
     <!-- =====================================================
@@ -106,6 +335,10 @@
                         انطباق کلی
                     </th>
 
+                    <th>
+                        عملیات
+                    </th>
+
                 </tr>
 
             </thead>
@@ -113,74 +346,180 @@
 
             <tbody>
 
-
                 {% for patient in patients %}
 
                     <tr>
+
+                        <!-- شماره بیمار -->
 
                         <td>
                             {{ patient.id }}
                         </td>
 
 
+                        <!-- سن -->
+
                         <td>
                             {{ patient.age }}
                         </td>
 
+
+                        <!-- جنسیت -->
 
                         <td>
                             {{ patient.get_gender_display }}
                         </td>
 
 
+                        <!-- تشخیص -->
+
                         <td>
                             {{ patient.psychiatric_diagnosis }}
                         </td>
 
+
+                        <!-- تعداد دارو -->
 
                         <td>
                             {{ patient.medications.count }}
                         </td>
 
 
+                        <!-- تاریخ شروع درمان -->
+
                         <td>
-                            {{ patient.treatment_start_date }}
+                            {{ patient.treatment_start_date|jalali_date }}
                         </td>
 
 
+                        <!-- آخرین تغییر دارو -->
+
                         <td>
-                            {{ patient.last_medication_change }}
+                            {{ patient.last_medication_change|jalali_date }}
                         </td>
 
+
+                        <!-- وضعیت انطباق کلی -->
 
                         <td>
                             {{ patient.get_overall_compliance }}
                         </td>
+
+
+                        <!-- عملیات -->
+
                         <td>
-                            <a href="{% url 'patient-detail' patient.pk %}">
+
+                            <a
+                                href="{% url 'patient-detail' patient.pk %}"
+                            >
                                 مشاهده پرونده
                             </a>
+
+                            |
+
+                            <a
+                                href="{% url 'patient-edit' patient.pk %}"
+                            >
+                                ویرایش
+                            </a>
+
                         </td>
 
                     </tr>
 
                 {% endfor %}
 
-
             </tbody>
 
         </table>
+
+
+        <!-- =================================================
+             Pagination
+             ================================================= -->
+
+        {% if is_paginated %}
+
+            <hr>
+
+            <div class="pagination">
+
+                <!-- صفحه اول -->
+
+                {% if page_obj.has_previous %}
+
+                    <a
+                        href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.gender %}&gender={{ request.GET.gender }}{% endif %}{% if request.GET.diabetes %}&diabetes={{ request.GET.diabetes }}{% endif %}{% if request.GET.hypertension %}&hypertension={{ request.GET.hypertension }}{% endif %}{% if request.GET.obesity %}&obesity={{ request.GET.obesity }}{% endif %}{% if request.GET.cardiovascular_disease %}&cardiovascular_disease={{ request.GET.cardiovascular_disease }}{% endif %}"
+                    >
+                        صفحه اول
+                    </a>
+
+                    |
+
+                    <!-- صفحه قبلی -->
+
+                    <a
+                        href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.gender %}&gender={{ request.GET.gender }}{% endif %}{% if request.GET.diabetes %}&diabetes={{ request.GET.diabetes }}{% endif %}{% if request.GET.hypertension %}&hypertension={{ request.GET.hypertension }}{% endif %}{% if request.GET.obesity %}&obesity={{ request.GET.obesity }}{% endif %}{% if request.GET.cardiovascular_disease %}&cardiovascular_disease={{ request.GET.cardiovascular_disease }}{% endif %}"
+                    >
+                        قبلی
+                    </a>
+
+                    |
+
+                {% endif %}
+
+
+                <!-- شماره صفحه فعلی -->
+
+                <span>
+
+                    صفحه
+                    {{ page_obj.number }}
+                    از
+                    {{ page_obj.paginator.num_pages }}
+
+                </span>
+
+
+                {% if page_obj.has_next %}
+
+                    |
+
+                    <!-- صفحه بعدی -->
+
+                    <a
+                        href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.gender %}&gender={{ request.GET.gender }}{% endif %}{% if request.GET.diabetes %}&diabetes={{ request.GET.diabetes }}{% endif %}{% if request.GET.hypertension %}&hypertension={{ request.GET.hypertension }}{% endif %}{% if request.GET.obesity %}&obesity={{ request.GET.obesity }}{% endif %}{% if request.GET.cardiovascular_disease %}&cardiovascular_disease={{ request.GET.cardiovascular_disease }}{% endif %}"
+                    >
+                        بعدی
+                    </a>
+
+                    |
+
+                    <!-- صفحه آخر -->
+
+                    <a
+                        href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.gender %}&gender={{ request.GET.gender }}{% endif %}{% if request.GET.diabetes %}&diabetes={{ request.GET.diabetes }}{% endif %}{% if request.GET.hypertension %}&hypertension={{ request.GET.hypertension }}{% endif %}{% if request.GET.obesity %}&obesity={{ request.GET.obesity }}{% endif %}{% if request.GET.cardiovascular_disease %}&cardiovascular_disease={{ request.GET.cardiovascular_disease }}{% endif %}"
+                    >
+                        صفحه آخر
+                    </a>
+
+                {% endif %}
+
+            </div>
+
+        {% endif %}
 
 
     {% else %}
 
 
         <!-- =================================================
-             هنوز بیماری ثبت نشده
+             هیچ بیماری پیدا نشد
              ================================================= -->
 
         <p>
-            هنوز هیچ بیماری ثبت نشده است.
+            هیچ بیماری با این مشخصات پیدا نشد.
         </p>
 
 

@@ -1,5 +1,6 @@
 from django.contrib import admin
 
+from .forms import PatientForm
 from .models import Patient, PatientMedication
 
 
@@ -25,6 +26,15 @@ class PatientMedicationInline(admin.TabularInline):
 
 @admin.register(Patient)
 class PatientAdmin(admin.ModelAdmin):
+
+    # -----------------------------------------------------
+    # استفاده از فرم سفارشی بیمار
+    #
+    # باعث می‌شود تاریخ‌ها در Admin نیز به صورت شمسی
+    # دریافت و سپس به تاریخ میلادی تبدیل شوند.
+    # -----------------------------------------------------
+
+    form = PatientForm
 
     # -----------------------------------------------------
     # داروهای بیمار را داخل صفحه بیمار نمایش می‌دهیم.

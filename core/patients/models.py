@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.exceptions import ValidationError
 
 
 # =========================================================
@@ -394,6 +395,34 @@ class Patient(models.Model):
         return self.medications.count() > 1
 
 
+    @property
+    def treatment_duration(self):
+        """
+        مدت زمان گذشته از شروع درمان.
+        """
+
+        from .utils.date_utils import calculate_duration, format_duration
+
+        duration = calculate_duration(
+            self.treatment_start_date
+        )
+
+        return format_duration(duration)
+
+    @property
+    def medication_change_duration(self):
+        """
+        مدت زمان گذشته از آخرین تغییر دارو یا دوز.
+        """
+
+        from .utils.date_utils import calculate_duration, format_duration
+
+        duration = calculate_duration(
+            self.last_medication_change
+        )
+
+        return format_duration(duration)
+    
     # =====================================================
     # 10. وضعیت پایش وزن / BMI
     #
@@ -725,10 +754,11 @@ class Patient(models.Model):
     # =====================================================
 
     def clean(self):
-
-        from django.core.exceptions import ValidationError
-
-        if self.last_medication_change < self.treatment_start_date:
+        if (
+            self.treatment_start_date
+            and self.last_medication_change
+            and self.last_medication_change < self.treatment_start_date
+        ):
             raise ValidationError(
                 "تاریخ آخرین تغییر دارو نمی‌تواند قبل از تاریخ شروع درمان باشد."
             )

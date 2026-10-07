@@ -200,3 +200,11 @@ if SHOW_DEBUGGER_TOOLBAR:
     hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
     INTERNAL_IPS = [ip[: ip.rfind(".")] + ".1" for ip in ips] + ["127.0.0.1", "10.0.2.2"]
     
+# صفحه‌ای که کاربر ناشناس برای ورود به آن هدایت می‌شود
+LOGIN_URL = "/accounts/login/"
+
+# صفحه بعد از ورود موفق
+LOGIN_REDIRECT_URL = "/list/"
+
+# صفحه بعد از خروج
+LOGOUT_REDIRECT_URL = "/accounts/login/"

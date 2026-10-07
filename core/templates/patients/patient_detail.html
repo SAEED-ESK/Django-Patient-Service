@@ -1,3 +1,4 @@
+{% load patient_filters %}
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 
@@ -208,26 +209,25 @@
     </h2>
 
 
-    <p>
+    <div class="info-item">
+        <strong>تاریخ شروع درمان:</strong>
+        {{ patient.treatment_start_date|jalali_date }}
+    </div>
 
-        <strong>
-            تاریخ شروع درمان:
-        </strong>
+    <div class="info-item">
+        <strong>مدت درمان:</strong>
+        {{ patient.treatment_duration }}
+    </div>
 
-        {{ patient.treatment_start_date }}
+    <div class="info-item">
+        <strong>آخرین تغییر دارو یا دوز:</strong>
+        {{ patient.last_medication_change|jalali_date }}
+    </div>
 
-    </p>
-
-
-    <p>
-
-        <strong>
-            آخرین تغییر دارو یا دوز:
-        </strong>
-
-        {{ patient.last_medication_change }}
-
-    </p>
+    <div class="info-item">
+        <strong>مدت زمان از آخرین تغییر:</strong>
+        {{ patient.medication_change_duration }}
+    </div>
 
 
     <!-- =====================================================

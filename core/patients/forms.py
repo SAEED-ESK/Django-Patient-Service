@@ -1,8 +1,54 @@
+import jdatetime
+from datetime import date
 from django import forms
 from django.core.exceptions import ValidationError
 
 from .models import Patient, PatientMedication
 
+
+class JalaliDateField(forms.DateField):
+    """
+    فیلد تاریخ که تاریخ شمسی را از کاربر دریافت می‌کند
+    و آن را به تاریخ میلادی تبدیل می‌کند.
+    """
+
+    def to_python(self, value):
+        if not value:
+            return None
+
+        # اگر مقدار از قبل date باشد، نیازی به تبدیل نیست
+        if isinstance(value, date):
+            return value
+
+        # جداکننده‌های مختلف را یکسان می‌کنیم
+        value = value.replace("-", "/")
+
+        try:
+            year, month, day = map(int, value.split("/"))
+
+            jalali_date = jdatetime.date(year, month, day)
+
+            return jalali_date.togregorian()
+
+        except (ValueError, TypeError):
+            raise forms.ValidationError(
+                "تاریخ را به صورت صحیح وارد کنید. مثال: 1405/07/15"
+            )
+
+    def prepare_value(self, value):
+        """
+        هنگام نمایش مقدار ذخیره‌شده در فرم،
+        تاریخ میلادی را به شمسی تبدیل می‌کند.
+        """
+
+        if not value:
+            return ""
+
+        if isinstance(value, date):
+            jalali_date = jdatetime.date.fromgregorian(date=value)
+            return jalali_date.strftime("%Y/%m/%d")
+
+        return value
 
 # =========================================================
 # فرم اطلاعات بیمار
@@ -11,62 +57,53 @@ from .models import Patient, PatientMedication
 
 class PatientForm(forms.ModelForm):
 
+    treatment_start_date = JalaliDateField(
+        label="تاریخ شروع درمان"
+    )
+
+    last_medication_change = JalaliDateField(
+        label="آخرین تغییر دارو یا دوز"
+    )
+
     class Meta:
         model = Patient
-
-        # تمام فیلدهای مدل Patient را در فرم قرار می‌دهیم.
         fields = "__all__"
 
-        # ظاهر ساده و قابل فهم فیلدها
         widgets = {
-
-            # تاریخ شروع درمان
-            "treatment_start_date": forms.DateInput(
-                attrs={"type": "date"}
-            ),
-
-            # تاریخ آخرین تغییر دارو یا دوز
-            "last_medication_change": forms.DateInput(
-                attrs={"type": "date"}
-            ),
-
-            # قسمت توضیحات
-            "notes": forms.Textarea(
+            "treatment_start_date": forms.TextInput(
                 attrs={
-                    "rows": 4,
-                    "placeholder": "توضیحات اضافی درباره بیمار..."
+                    "placeholder": "1405/07/15",
+                }
+            ),
+            "last_medication_change": forms.TextInput(
+                attrs={
+                    "placeholder": "1405/07/15",
                 }
             ),
         }
 
-    # =====================================================
-    # بررسی تاریخ‌ها
-    #
-    # آخرین تغییر دارو نمی‌تواند قبل از شروع درمان باشد.
-    # =====================================================
-
     def clean(self):
-
         cleaned_data = super().clean()
 
-        # تاریخ شروع درمان
-        treatment_start = cleaned_data.get("treatment_start_date")
+        treatment_start_date = cleaned_data.get(
+            "treatment_start_date"
+        )
 
-        # تاریخ آخرین تغییر
-        last_change = cleaned_data.get("last_medication_change")
+        last_medication_change = cleaned_data.get(
+            "last_medication_change"
+        )
 
-        # اگر هر دو تاریخ وارد شده باشند
-        if treatment_start and last_change:
-
-            if last_change < treatment_start:
-
-                raise ValidationError(
-                    "تاریخ آخرین تغییر دارو نمی‌تواند قبل از تاریخ شروع درمان باشد."
-                )
+        if (
+            treatment_start_date
+            and last_medication_change
+            and last_medication_change < treatment_start_date
+        ):
+            raise forms.ValidationError(
+                "تاریخ آخرین تغییر دارو نمی‌تواند قبل از تاریخ شروع درمان باشد."
+            )
 
         return cleaned_data
-
-
+    
 # =========================================================
 # فرم داروی بیمار
 # =========================================================

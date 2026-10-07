@@ -120,18 +120,62 @@ class PatientUpdateView(UpdateView):
 # =========================================================
 
 class PatientListView(ListView):
-
-    # مدل مورد استفاده
     model = Patient
-
-    # Template صفحه لیست
     template_name = "patients/patient_list.html"
-
-    # نامی که لیست بیماران با آن به Template فرستاده می‌شود
     context_object_name = "patients"
-
-    # جدیدترین بیماران اول نمایش داده شوند
     ordering = ["-created_at"]
+    paginate_by = 2
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        # -----------------------------------------------------
+        # جستجو بر اساس تشخیص روان پزشکی
+        # -----------------------------------------------------
+
+        search_query = self.request.GET.get("search", "").strip()
+
+        if search_query:
+            queryset = queryset.filter(
+                psychiatric_diagnosis__icontains=search_query
+            )
+
+        # -----------------------------------------------------
+        # فیلتر جنسیت
+        # -----------------------------------------------------
+
+        gender = self.request.GET.get("gender")
+
+        if gender in ["male", "female"]:
+            queryset = queryset.filter(
+                gender=gender
+            )
+
+        # -----------------------------------------------------
+        # فیلتر بیماری‌های همراه
+        # -----------------------------------------------------
+
+        if self.request.GET.get("diabetes") == "1":
+            queryset = queryset.filter(
+                diabetes=True
+            )
+
+        if self.request.GET.get("hypertension") == "1":
+            queryset = queryset.filter(
+                hypertension=True
+            )
+
+        if self.request.GET.get("obesity") == "1":
+            queryset = queryset.filter(
+                obesity=True
+            )
+
+        if self.request.GET.get("cardiovascular_disease") == "1":
+            queryset = queryset.filter(
+                cardiovascular_disease=True
+            )
+
+        return queryset
 
 # =========================================================
 # جزئیات یک بیمار
