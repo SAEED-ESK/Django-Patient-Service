@@ -204,7 +204,7 @@ if SHOW_DEBUGGER_TOOLBAR:
 LOGIN_URL = "/accounts/login/"
 
 # صفحه بعد از ورود موفق
-LOGIN_REDIRECT_URL = "/list/"
+LOGIN_REDIRECT_URL = "/"
 
 # صفحه بعد از خروج
 LOGOUT_REDIRECT_URL = "/accounts/login/"

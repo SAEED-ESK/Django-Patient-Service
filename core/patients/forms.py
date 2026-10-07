@@ -1,27 +1,30 @@
 import jdatetime
 from datetime import date
+
 from django import forms
 from django.core.exceptions import ValidationError
 
 from .models import Patient, PatientMedication
 
 
+# =========================================================
+# فیلد تاریخ شمسی
+# =========================================================
+
 class JalaliDateField(forms.DateField):
     """
-    فیلد تاریخ که تاریخ شمسی را از کاربر دریافت می‌کند
-    و آن را به تاریخ میلادی تبدیل می‌کند.
+    تاریخ شمسی را از کاربر دریافت می‌کند
+    و قبل از ذخیره به تاریخ میلادی تبدیل می‌کند.
     """
 
     def to_python(self, value):
         if not value:
             return None
 
-        # اگر مقدار از قبل date باشد، نیازی به تبدیل نیست
         if isinstance(value, date):
             return value
 
-        # جداکننده‌های مختلف را یکسان می‌کنیم
-        value = value.replace("-", "/")
+        value = value.strip().replace("-", "/")
 
         try:
             year, month, day = map(int, value.split("/"))
@@ -37,7 +40,7 @@ class JalaliDateField(forms.DateField):
 
     def prepare_value(self, value):
         """
-        هنگام نمایش مقدار ذخیره‌شده در فرم،
+        هنگام نمایش تاریخ ذخیره‌شده،
         تاریخ میلادی را به شمسی تبدیل می‌کند.
         """
 
@@ -46,13 +49,14 @@ class JalaliDateField(forms.DateField):
 
         if isinstance(value, date):
             jalali_date = jdatetime.date.fromgregorian(date=value)
+
             return jalali_date.strftime("%Y/%m/%d")
 
         return value
 
+
 # =========================================================
-# فرم اطلاعات بیمار
-# مربوط به اطلاعات اصلی بیمار و بخش‌های پایش
+# فرم بیمار
 # =========================================================
 
 class PatientForm(forms.ModelForm):
@@ -73,11 +77,15 @@ class PatientForm(forms.ModelForm):
             "treatment_start_date": forms.TextInput(
                 attrs={
                     "placeholder": "1405/07/15",
+                    "autocomplete": "off",
+                    "class": "jalali-date-input",
                 }
             ),
             "last_medication_change": forms.TextInput(
                 attrs={
                     "placeholder": "1405/07/15",
+                    "autocomplete": "off",
+                    "class": "jalali-date-input",
                 }
             ),
         }
@@ -103,9 +111,10 @@ class PatientForm(forms.ModelForm):
             )
 
         return cleaned_data
-    
+
+
 # =========================================================
-# فرم داروی بیمار
+# فرم دارو
 # =========================================================
 
 class PatientMedicationForm(forms.ModelForm):
@@ -119,9 +128,7 @@ class PatientMedicationForm(forms.ModelForm):
             "form",
         ]
 
-    # بررسی دوز
     def clean_dose(self):
-
         dose = self.cleaned_data.get("dose")
 
         if dose is not None and dose <= 0:
@@ -133,15 +140,12 @@ class PatientMedicationForm(forms.ModelForm):
 
 
 # =========================================================
-# بررسی مجموعه داروهای بیمار
-#
-# هر بیمار حداقل باید یک دارو داشته باشد.
+# Formset داروها
 # =========================================================
 
 class PatientMedicationFormSetBase(forms.BaseInlineFormSet):
 
     def clean(self):
-
         super().clean()
 
         medication_count = 0
@@ -151,11 +155,15 @@ class PatientMedicationFormSetBase(forms.BaseInlineFormSet):
             if not hasattr(form, "cleaned_data"):
                 continue
 
+            # دارویی که حذف شده نباید در شمارش حساب شود
             if form.cleaned_data.get("DELETE"):
                 continue
 
-            if form.cleaned_data.get("drug"):
-                medication_count += 1
+            # فرم کاملاً خالی را نادیده می‌گیریم
+            if not form.cleaned_data.get("drug"):
+                continue
+
+            medication_count += 1
 
         if medication_count == 0:
             raise ValidationError(
@@ -164,7 +172,7 @@ class PatientMedicationFormSetBase(forms.BaseInlineFormSet):
 
 
 # =========================================================
-# Formset نهایی داروها
+# Formset نهایی
 # =========================================================
 
 PatientMedicationFormSet = forms.inlineformset_factory(

@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.db import transaction
 from django.shortcuts import redirect
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import (
     CreateView, ListView, DetailView,
     UpdateView, DeleteView)
@@ -9,7 +10,7 @@ from .forms import PatientForm, PatientMedicationFormSet
 from .models import Patient
 
 
-class PatientCreateView(CreateView):
+class PatientCreateView(LoginRequiredMixin, CreateView):
 
     model = Patient
     form_class = PatientForm
@@ -56,14 +57,14 @@ class PatientCreateView(CreateView):
         )
 
         return redirect(
-            "/admin/patients/patient/"
+            "/patients/"
         )
 
 # =========================================================
 # ویرایش بیمار
 # =========================================================
 
-class PatientUpdateView(UpdateView):
+class PatientUpdateView(LoginRequiredMixin, UpdateView):
 
     model = Patient
     form_class = PatientForm
@@ -119,12 +120,12 @@ class PatientUpdateView(UpdateView):
 # لیست بیماران
 # =========================================================
 
-class PatientListView(ListView):
+class PatientListView(LoginRequiredMixin, ListView):
     model = Patient
     template_name = "patients/patient_list.html"
     context_object_name = "patients"
     ordering = ["-created_at"]
-    paginate_by = 2
+    paginate_by = 10
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -181,7 +182,7 @@ class PatientListView(ListView):
 # جزئیات یک بیمار
 # =========================================================
 
-class PatientDetailView(DetailView):
+class PatientDetailView(LoginRequiredMixin, DetailView):
 
     # مدل مورد استفاده
     model = Patient
@@ -196,7 +197,7 @@ class PatientDetailView(DetailView):
 # حذف بیمار
 # =========================================================
 
-class PatientDeleteView(DeleteView):
+class PatientDeleteView(LoginRequiredMixin, DeleteView):
 
     model = Patient
     template_name = "patients/patient_confirm_delete.html"

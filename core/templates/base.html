@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 
@@ -10,150 +12,221 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>مدیریت بیماران</title>
+    <meta
+        name="description"
+        content="سامانه مدیریت و پایش اطلاعات بیماران"
+    >
+
+    <title>
+        {% block title %}
+            سامانه مدیریت بیماران
+        {% endblock %}
+    </title>
+
+    <!-- فونت فارسی -->
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- آیکون‌ها -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <!-- CSS اصلی -->
+    <link
+        rel="stylesheet"
+        href="{% static 'css/style.css' %}"
+    >
+
+    {% block extra_css %}
+    {% endblock %}
 
 </head>
 
 
 <body>
 
-
     <!-- =====================================================
-         عنوان اصلی
+         نوار ناوبری
          ===================================================== -->
 
-    <h1>
-        سامانه مدیریت بیماران
-    </h1>
+    <header class="site-header">
+
+        <nav class="navbar">
+
+            <div class="container navbar-content">
+
+                <a
+                    href="{% url 'website:index' %}"
+                    class="brand"
+                >
+
+                    <span class="brand-icon">
+                        <i class="fa-solid fa-prescription-bottle-medical"></i>
+                    </span>
+
+                    <span>
+                        سامانه مدیریت بیماران
+                    </span>
+
+                </a>
 
 
-    <p>
-        داشبورد مدیریت اطلاعات بیماران
-    </p>
+                {% if user.is_authenticated %}
+
+                    <div class="nav-links">
+
+                        <a
+                            href="{% url 'patient-list' %}"
+                            class="nav-link"
+                        >
+                            <i class="fa-solid fa-users"></i>
+                            بیماران
+                        </a>
 
 
-    <hr>
+                        <a
+                            href="{% url 'patient-create' %}"
+                            class="nav-link"
+                        >
+                            <i class="fa-solid fa-user-plus"></i>
+                            ثبت بیمار
+                        </a>
 
 
+                        <div class="nav-user">
 
-    <!-- =====================================================
-         بخش بیماران
-         ===================================================== -->
+                            <span class="user-avatar">
+                                <i class="fa-solid fa-user"></i>
+                            </span>
 
-    <h2>
-        بیماران
-    </h2>
+                            <span>
+                                {{ user.username }}
+                            </span>
 
-
-    <p>
-        مدیریت اطلاعات و پرونده بیماران
-    </p>
+                        </div>
 
 
-    <a href="{% url 'patient-list' %}">
-        مشاهده بیماران
-    </a>
+                        <form
+                            method="post"
+                            action="{% url 'logout' %}"
+                            class="logout-form"
+                        >
 
+                            {% csrf_token %}
 
-    <br>
-    <br>
+                            <button
+                                type="submit"
+                                class="logout-btn"
+                            >
 
+                                <i class="fa-solid fa-right-from-bracket"></i>
 
-    <a href="{% url 'patient-create' %}">
-        + ثبت بیمار جدید
-    </a>
+                                خروج
 
+                            </button>
 
+                        </form>
 
-    <hr>
+                    </div>
 
+                {% endif %}
 
+            </div>
 
-    <!-- =====================================================
-         بخش‌های آینده
-         ===================================================== -->
+        </nav>
 
-    <h2>
-        مدیریت پرونده
-    </h2>
-
-
-    <ul>
-
-        <li>
-            <a href="">
-                جزئیات بیمار
-            </a>
-        </li>
-
-        <li>
-            <a href="#">
-                ویرایش بیمار
-            </a>
-        </li>
-
-        <li>
-            <a href="#">
-                حذف بیمار
-            </a>
-        </li>
-
-    </ul>
-
-
-
-    <!-- =====================================================
-         بخش پایش
-         ===================================================== -->
-
-    <h2>
-        پایش و انطباق
-    </h2>
-
-
-    <ul>
-
-        <li>
-            <a href="#">
-                وضعیت پایش بیماران
-            </a>
-        </li>
-
-        <li>
-            <a href="#">
-                گزارش انطباق
-            </a>
-        </li>
-
-    </ul>
-
+    </header>
 
 
     <!-- =====================================================
-         بخش تنظیمات
+         پیام‌های سیستم
          ===================================================== -->
 
-    <h2>
-        سیستم
-    </h2>
+    {% if messages %}
+
+        <div class="container messages-container">
+
+            {% for message in messages %}
+
+                <div class="alert">
+
+                    <i class="fa-solid fa-circle-check"></i>
+
+                    <span>
+                        {{ message }}
+                    </span>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
 
 
-    <ul>
+    <!-- =====================================================
+         محتوای اصلی
+         ===================================================== -->
 
-        <li>
-            <a href="#">
-                پروفایل کاربر
-            </a>
-        </li>
+    <main class="main-content">
 
-        <li>
-            <a href="#">
-                خروج
-            </a>
-        </li>
+        <div class="container">
 
-    </ul>
+            {% block content %}
+            {% endblock %}
 
+        </div>
+
+    </main>
+
+
+    <!-- =====================================================
+         Footer
+         ===================================================== -->
+
+    <footer class="site-footer">
+
+        <div class="container footer-content">
+
+            <div>
+
+                <strong>
+                    سامانه مدیریت بیماران
+                </strong>
+
+                <span>
+                    مدیریت، پایش و ثبت اطلاعات بیماران
+                </span>
+
+            </div>
+
+            <span>
+                © {% now "Y" %}
+            </span>
+
+        </div>
+
+    </footer>
+
+
+    {% block extra_js %}
+    {% endblock %}
 
 </body>
 

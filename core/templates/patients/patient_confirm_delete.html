@@ -1,76 +1,424 @@
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
+{% extends "base.html" %}
+{% load static %}
 
-<head>
-
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>
-        حذف بیمار {{ patient.id }}
-    </title>
-
-</head>
+{% block title %}
+    حذف بیمار {{ patient.id }} | سامانه مدیریت بیماران
+{% endblock %}
 
 
-<body>
+{% block content %}
+
+<div class="patient-delete-page">
 
 
     <!-- =====================================================
-         عنوان
+         Delete Card
          ===================================================== -->
 
-    <h1>
-        حذف پرونده بیمار
-    </h1>
+    <div class="delete-card">
 
 
-    <!-- =====================================================
-         پیام هشدار
-         ===================================================== -->
+        <!-- Icon -->
 
-    <p>
+        <div class="delete-icon">
 
-        آیا مطمئن هستید که می‌خواهید پرونده بیمار شماره
-        <strong>
-            {{ patient.id }}
-        </strong>
+            <i class="fa-solid fa-trash-can"></i>
 
-        را حذف کنید؟
-
-    </p>
+        </div>
 
 
-    <p>
-        این عملیات قابل بازگشت نیست.
-    </p>
+        <!-- Header -->
+
+        <span class="delete-eyebrow">
+            حذف پرونده
+        </span>
 
 
-    <!-- =====================================================
-         فرم حذف
-         ===================================================== -->
-
-    <form method="post">
-
-        {% csrf_token %}
+        <h1>
+            حذف پرونده بیمار
+        </h1>
 
 
-        <button type="submit">
-            بله، حذف شود
-        </button>
+        <!-- Message -->
+
+        <p class="delete-message">
+
+            آیا مطمئن هستید که می‌خواهید پرونده بیمار شماره
+
+            <strong>
+                {{ patient.id }}
+            </strong>
+
+            را حذف کنید؟
+
+        </p>
 
 
-        <a href="{% url 'patient-detail' patient.id %}">
-            انصراف
-        </a>
+        <!-- Warning -->
 
-    </form>
+        <div class="delete-warning">
+
+            <i class="fa-solid fa-triangle-exclamation"></i>
+
+            <div>
+
+                <strong>
+                    توجه
+                </strong>
+
+                <span>
+                    این عملیات قابل بازگشت نیست و اطلاعات این پرونده حذف خواهد شد.
+                </span>
+
+            </div>
+
+        </div>
 
 
-</body>
+        <!-- Actions -->
 
-</html>
+        <form method="post" class="delete-actions">
+
+            {% csrf_token %}
+
+
+            <a
+                href="{% url 'patient-detail' patient.id %}"
+                class="cancel-delete-btn"
+            >
+
+                <i class="fa-solid fa-arrow-right"></i>
+
+                انصراف
+
+            </a>
+
+
+            <button
+                type="submit"
+                class="confirm-delete-btn"
+            >
+
+                <i class="fa-solid fa-trash-can"></i>
+
+                بله، حذف شود
+
+            </button>
+
+        </form>
+
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+/* =====================================================
+   Page
+   ===================================================== */
+
+.patient-delete-page {
+    min-height: 65vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 30px 0 60px;
+}
+
+
+/* =====================================================
+   Delete Card
+   ===================================================== */
+
+.delete-card {
+    width: 100%;
+    max-width: 520px;
+
+    box-sizing: border-box;
+
+    background: #fff;
+
+    border: 1px solid #eeeaf4;
+
+    border-radius: 20px;
+
+    padding: 38px 40px;
+
+    text-align: center;
+
+    box-shadow:
+        0 8px 30px rgba(52, 39, 77, 0.06);
+}
+
+
+/* =====================================================
+   Delete Icon
+   ===================================================== */
+
+.delete-icon {
+    width: 62px;
+    height: 62px;
+
+    margin: 0 auto 18px;
+
+    border-radius: 17px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #fff0f1;
+
+    color: #bd5962;
+
+    font-size: 24px;
+}
+
+
+/* =====================================================
+   Eyebrow
+   ===================================================== */
+
+.delete-eyebrow {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #bd5962;
+
+    font-size: 11px;
+
+    font-weight: 700;
+}
+
+
+/* =====================================================
+   Title
+   ===================================================== */
+
+.delete-card h1 {
+    margin: 0;
+
+    color: #292333;
+
+    font-size: 23px;
+
+    font-weight: 700;
+}
+
+
+/* =====================================================
+   Message
+   ===================================================== */
+
+.delete-message {
+    margin: 15px 0 22px;
+
+    color: #77717f;
+
+    font-size: 13px;
+
+    line-height: 2;
+}
+
+
+.delete-message strong {
+    color: #4a4352;
+
+    font-weight: 700;
+}
+
+
+/* =====================================================
+   Warning
+   ===================================================== */
+
+.delete-warning {
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 11px;
+
+    padding: 13px 15px;
+
+    margin-bottom: 25px;
+
+    border-radius: 11px;
+
+    background: #fff7f7;
+
+    border: 1px solid #f3dddd;
+
+    text-align: right;
+
+    color: #9d6269;
+}
+
+
+.delete-warning > i {
+    flex-shrink: 0;
+
+    margin-top: 2px;
+
+    font-size: 16px;
+}
+
+
+.delete-warning strong,
+.delete-warning span {
+    display: block;
+}
+
+
+.delete-warning strong {
+    margin-bottom: 3px;
+
+    color: #9d4e57;
+
+    font-size: 11px;
+}
+
+
+.delete-warning span {
+    color: #a36d73;
+
+    font-size: 10px;
+
+    line-height: 1.8;
+}
+
+
+/* =====================================================
+   Actions
+   ===================================================== */
+
+.delete-actions {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 10px;
+}
+
+
+.cancel-delete-btn,
+.confirm-delete-btn {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 7px;
+
+    min-width: 125px;
+
+    box-sizing: border-box;
+
+    padding: 11px 18px;
+
+    border-radius: 10px;
+
+    font-family: inherit;
+
+    font-size: 11px;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+
+/* Cancel */
+
+.cancel-delete-btn {
+    background: #f5f3f7;
+
+    color: #77717f;
+}
+
+
+.cancel-delete-btn:hover {
+    background: #ece9f0;
+
+    color: #5e5866;
+}
+
+
+/* Confirm */
+
+.confirm-delete-btn {
+    border: none;
+
+    background: #bd5962;
+
+    color: #fff;
+
+    font-weight: 600;
+}
+
+
+.confirm-delete-btn:hover {
+    background: #a9434d;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 5px 14px rgba(189, 89, 98, 0.18);
+}
+
+
+/* =====================================================
+   Responsive
+   ===================================================== */
+
+@media (max-width: 600px) {
+
+    .patient-delete-page {
+        padding: 20px 0 40px;
+    }
+
+
+    .delete-card {
+        padding: 30px 22px;
+
+        border-radius: 16px;
+    }
+
+
+    .delete-card h1 {
+        font-size: 21px;
+    }
+
+
+    .delete-message {
+        font-size: 12px;
+    }
+
+
+    .delete-actions {
+        flex-direction: column-reverse;
+    }
+
+
+    .cancel-delete-btn,
+    .confirm-delete-btn {
+        width: 100%;
+    }
+
+}
+
+</style>
+
+{% endblock %}

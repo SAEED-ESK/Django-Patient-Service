@@ -1,531 +1,954 @@
+{% extends "base.html" %}
 {% load patient_filters %}
 
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
+{% block title %}
+    بیماران | سامانه مدیریت بیماران
+{% endblock %}
 
-<head>
+{% block content %}
 
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>لیست بیماران</title>
-
-</head>
-
-
-<body>
+<div class="patients-page">
 
     <!-- =====================================================
-         عنوان صفحه
+         Header
          ===================================================== -->
 
-    <h1>
-        لیست بیماران
-    </h1>
+    <div class="page-header">
 
+        <div>
+            <span class="page-eyebrow">
+                <i class="fa-solid fa-users"></i>
+                مدیریت بیماران
+            </span>
 
-    <!-- =====================================================
-         پیام‌های Django
-         ===================================================== -->
-
-    {% if messages %}
-
-        {% for message in messages %}
+            <h1>پرونده بیماران</h1>
 
             <p>
-                {{ message }}
+                مشاهده، جستجو و مدیریت اطلاعات ثبت‌شده بیماران
             </p>
-
-        {% endfor %}
-
-    {% endif %}
-
-
-    <!-- =====================================================
-         جستجوی بیمار
-         ===================================================== -->
-
-    <form method="get">
-
-        <input
-            type="text"
-            name="search"
-            value="{{ request.GET.search|default:'' }}"
-            placeholder="جستجو بر اساس تشخیص روان‌پزشکی"
-        >
-
-        <!--
-        اگر فیلترهای دیگری انتخاب شده باشند،
-        هنگام جستجو آن‌ها را حفظ می‌کنیم.
-        -->
-
-        {% if request.GET.gender %}
-            <input
-                type="hidden"
-                name="gender"
-                value="{{ request.GET.gender }}"
-            >
-        {% endif %}
-
-        {% if request.GET.diabetes %}
-            <input
-                type="hidden"
-                name="diabetes"
-                value="{{ request.GET.diabetes }}"
-            >
-        {% endif %}
-
-        {% if request.GET.hypertension %}
-            <input
-                type="hidden"
-                name="hypertension"
-                value="{{ request.GET.hypertension }}"
-            >
-        {% endif %}
-
-        {% if request.GET.obesity %}
-            <input
-                type="hidden"
-                name="obesity"
-                value="{{ request.GET.obesity }}"
-            >
-        {% endif %}
-
-        {% if request.GET.cardiovascular_disease %}
-            <input
-                type="hidden"
-                name="cardiovascular_disease"
-                value="{{ request.GET.cardiovascular_disease }}"
-            >
-        {% endif %}
-
-
-        <button type="submit">
-            جستجو
-        </button>
-
-
-        {% if request.GET.search %}
-
-            <a href="{% url 'patient-list' %}">
-                حذف جستجو
-            </a>
-
-        {% endif %}
-
-    </form>
-
-
-    <hr>
-
-
-    <!-- =====================================================
-         فیلتر بیماران
-         ===================================================== -->
-
-    <form method="get">
-
-        <!--
-        حفظ عبارت جستجو هنگام اعمال فیلتر
-        -->
-
-        {% if request.GET.search %}
-
-            <input
-                type="hidden"
-                name="search"
-                value="{{ request.GET.search }}"
-            >
-
-        {% endif %}
-
-
-        <!-- =================================================
-             فیلتر جنسیت
-             ================================================= -->
-
-        <label for="gender">
-            جنسیت:
-        </label>
-
-        <select name="gender" id="gender">
-
-            <option value="">
-                همه
-            </option>
-
-            <option
-                value="male"
-                {% if request.GET.gender == "male" %}
-                    selected
-                {% endif %}
-            >
-                مرد
-            </option>
-
-            <option
-                value="female"
-                {% if request.GET.gender == "female" %}
-                    selected
-                {% endif %}
-            >
-                زن
-            </option>
-
-        </select>
-
-
-        <!-- =================================================
-             فیلتر دیابت
-             ================================================= -->
-
-        <label>
-
-            <input
-                type="checkbox"
-                name="diabetes"
-                value="1"
-                {% if request.GET.diabetes == "1" %}
-                    checked
-                {% endif %}
-            >
-
-            دیابت
-
-        </label>
-
-
-        <!-- =================================================
-             فیلتر پرفشاری خون
-             ================================================= -->
-
-        <label>
-
-            <input
-                type="checkbox"
-                name="hypertension"
-                value="1"
-                {% if request.GET.hypertension == "1" %}
-                    checked
-                {% endif %}
-            >
-
-            پرفشاری خون
-
-        </label>
-
-
-        <!-- =================================================
-             فیلتر چاقی
-             ================================================= -->
-
-        <label>
-
-            <input
-                type="checkbox"
-                name="obesity"
-                value="1"
-                {% if request.GET.obesity == "1" %}
-                    checked
-                {% endif %}
-            >
-
-            چاقی
-
-        </label>
-
-
-        <!-- =================================================
-             فیلتر بیماری قلبی عروقی
-             ================================================= -->
-
-        <label>
-
-            <input
-                type="checkbox"
-                name="cardiovascular_disease"
-                value="1"
-                {% if request.GET.cardiovascular_disease == "1" %}
-                    checked
-                {% endif %}
-            >
-
-            بیماری قلبی عروقی
-
-        </label>
-
-
-        <button type="submit">
-            اعمال فیلتر
-        </button>
-
-
-        <a href="{% url 'patient-list' %}">
-            حذف فیلترها
+        </div>
+
+        <a href="{% url 'patient-create' %}" class="page-header-btn">
+            <i class="fa-solid fa-user-plus"></i>
+            ثبت بیمار جدید
         </a>
 
-    </form>
-
-
-    <hr>
+    </div>
 
 
     <!-- =====================================================
-         دکمه ثبت بیمار جدید
+         Search & Filters
          ===================================================== -->
 
-    <a href="{% url 'patient-create' %}">
-        + ثبت بیمار جدید
-    </a>
+    <div class="filter-card">
+
+        <form method="get">
+
+            <div class="filter-row">
+
+                <div class="search-box">
+
+                    <label for="search">
+                        جستجو
+                    </label>
+
+                    <div class="input-with-icon">
+
+                        <i class="fa-solid fa-magnifying-glass"></i>
+
+                        <input
+                            type="text"
+                            id="search"
+                            name="search"
+                            value="{{ request.GET.search|default:'' }}"
+                            placeholder="جستجو بر اساس تشخیص روان پزشکی..."
+                        >
+
+                    </div>
+
+                </div>
 
 
-    <hr>
+                <div class="filter-item">
+
+                    <label for="gender">
+                        جنسیت
+                    </label>
+
+                    <select id="gender" name="gender">
+
+                        <option value="">
+                            همه
+                        </option>
+
+                        <option
+                            value="male"
+                            {% if request.GET.gender == "male" %}selected{% endif %}
+                        >
+                            مرد
+                        </option>
+
+                        <option
+                            value="female"
+                            {% if request.GET.gender == "female" %}selected{% endif %}
+                        >
+                            زن
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="filter-checks">
+
+                    <span class="filter-label">
+                        بیماری‌های همراه
+                    </span>
+
+                    <div class="checkbox-group">
+
+                        <label class="check-item">
+                            <input
+                                type="checkbox"
+                                name="diabetes"
+                                value="1"
+                                {% if request.GET.diabetes == "1" %}checked{% endif %}
+                            >
+                            <span>دیابت</span>
+                        </label>
+
+                        <label class="check-item">
+                            <input
+                                type="checkbox"
+                                name="hypertension"
+                                value="1"
+                                {% if request.GET.hypertension == "1" %}checked{% endif %}
+                            >
+                            <span>فشار خون</span>
+                        </label>
+
+                        <label class="check-item">
+                            <input
+                                type="checkbox"
+                                name="obesity"
+                                value="1"
+                                {% if request.GET.obesity == "1" %}checked{% endif %}
+                            >
+                            <span>چاقی</span>
+                        </label>
+
+                        <label class="check-item">
+                            <input
+                                type="checkbox"
+                                name="cardiovascular_disease"
+                                value="1"
+                                {% if request.GET.cardiovascular_disease == "1" %}checked{% endif %}
+                            >
+                            <span>بیماری قلبی</span>
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+                <div class="filter-actions">
+
+                    <button type="submit" class="filter-btn">
+                        <i class="fa-solid fa-filter"></i>
+                        اعمال فیلتر
+                    </button>
+
+                    <a href="{% url 'patient-list' %}" class="clear-btn">
+                        پاک کردن
+                    </a>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
 
 
     <!-- =====================================================
-         بررسی وجود بیمار
+         Patients Table
          ===================================================== -->
 
-    {% if patients %}
+    <div class="patients-card">
 
+        <div class="patients-card-header">
 
-        <!-- =================================================
-             جدول بیماران
-             ================================================= -->
-
-        <table border="1" cellpadding="10">
-
-            <thead>
-
-                <tr>
-
-                    <th>
-                        شماره
-                    </th>
-
-                    <th>
-                        سن
-                    </th>
-
-                    <th>
-                        جنس
-                    </th>
-
-                    <th>
-                        تشخیص
-                    </th>
-
-                    <th>
-                        تعداد دارو
-                    </th>
-
-                    <th>
-                        تاریخ شروع درمان
-                    </th>
-
-                    <th>
-                        آخرین تغییر دارو
-                    </th>
-
-                    <th>
-                        انطباق کلی
-                    </th>
-
-                    <th>
-                        عملیات
-                    </th>
-
-                </tr>
-
-            </thead>
-
-
-            <tbody>
-
-                {% for patient in patients %}
-
-                    <tr>
-
-                        <!-- شماره بیمار -->
-
-                        <td>
-                            {{ patient.id }}
-                        </td>
-
-
-                        <!-- سن -->
-
-                        <td>
-                            {{ patient.age }}
-                        </td>
-
-
-                        <!-- جنسیت -->
-
-                        <td>
-                            {{ patient.get_gender_display }}
-                        </td>
-
-
-                        <!-- تشخیص -->
-
-                        <td>
-                            {{ patient.psychiatric_diagnosis }}
-                        </td>
-
-
-                        <!-- تعداد دارو -->
-
-                        <td>
-                            {{ patient.medications.count }}
-                        </td>
-
-
-                        <!-- تاریخ شروع درمان -->
-
-                        <td>
-                            {{ patient.treatment_start_date|jalali_date }}
-                        </td>
-
-
-                        <!-- آخرین تغییر دارو -->
-
-                        <td>
-                            {{ patient.last_medication_change|jalali_date }}
-                        </td>
-
-
-                        <!-- وضعیت انطباق کلی -->
-
-                        <td>
-                            {{ patient.get_overall_compliance }}
-                        </td>
-
-
-                        <!-- عملیات -->
-
-                        <td>
-
-                            <a
-                                href="{% url 'patient-detail' patient.pk %}"
-                            >
-                                مشاهده پرونده
-                            </a>
-
-                            |
-
-                            <a
-                                href="{% url 'patient-edit' patient.pk %}"
-                            >
-                                ویرایش
-                            </a>
-
-                        </td>
-
-                    </tr>
-
-                {% endfor %}
-
-            </tbody>
-
-        </table>
-
-
-        <!-- =================================================
-             Pagination
-             ================================================= -->
-
-        {% if is_paginated %}
-
-            <hr>
-
-            <div class="pagination">
-
-                <!-- صفحه اول -->
-
-                {% if page_obj.has_previous %}
-
-                    <a
-                        href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.gender %}&gender={{ request.GET.gender }}{% endif %}{% if request.GET.diabetes %}&diabetes={{ request.GET.diabetes }}{% endif %}{% if request.GET.hypertension %}&hypertension={{ request.GET.hypertension }}{% endif %}{% if request.GET.obesity %}&obesity={{ request.GET.obesity }}{% endif %}{% if request.GET.cardiovascular_disease %}&cardiovascular_disease={{ request.GET.cardiovascular_disease }}{% endif %}"
-                    >
-                        صفحه اول
-                    </a>
-
-                    |
-
-                    <!-- صفحه قبلی -->
-
-                    <a
-                        href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.gender %}&gender={{ request.GET.gender }}{% endif %}{% if request.GET.diabetes %}&diabetes={{ request.GET.diabetes }}{% endif %}{% if request.GET.hypertension %}&hypertension={{ request.GET.hypertension }}{% endif %}{% if request.GET.obesity %}&obesity={{ request.GET.obesity }}{% endif %}{% if request.GET.cardiovascular_disease %}&cardiovascular_disease={{ request.GET.cardiovascular_disease }}{% endif %}"
-                    >
-                        قبلی
-                    </a>
-
-                    |
-
-                {% endif %}
-
-
-                <!-- شماره صفحه فعلی -->
+            <div>
+                <h2>لیست بیماران</h2>
 
                 <span>
-
-                    صفحه
-                    {{ page_obj.number }}
-                    از
-                    {{ page_obj.paginator.num_pages }}
-
+                    {% if patients %}
+                        {{ patients.paginator.count }} پرونده ثبت شده
+                    {% else %}
+                        پرونده‌ای ثبت نشده است
+                    {% endif %}
                 </span>
+            </div>
+
+        </div>
 
 
-                {% if page_obj.has_next %}
+        {% if patients %}
 
-                    |
+            <div class="table-wrapper">
 
-                    <!-- صفحه بعدی -->
+                <table class="patients-table">
 
-                    <a
-                        href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.gender %}&gender={{ request.GET.gender }}{% endif %}{% if request.GET.diabetes %}&diabetes={{ request.GET.diabetes }}{% endif %}{% if request.GET.hypertension %}&hypertension={{ request.GET.hypertension }}{% endif %}{% if request.GET.obesity %}&obesity={{ request.GET.obesity }}{% endif %}{% if request.GET.cardiovascular_disease %}&cardiovascular_disease={{ request.GET.cardiovascular_disease }}{% endif %}"
-                    >
-                        بعدی
-                    </a>
+                    <thead>
 
-                    |
+                        <tr>
+                            <th>شماره</th>
+                            <th>سن</th>
+                            <th>جنسیت</th>
+                            <th>تشخیص روان پزشکی</th>
+                            <th>شروع درمان</th>
+                            <th>آخرین تغییر دارو</th>
+                            <th>عملیات</th>
+                        </tr>
 
-                    <!-- صفحه آخر -->
+                    </thead>
 
-                    <a
-                        href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.gender %}&gender={{ request.GET.gender }}{% endif %}{% if request.GET.diabetes %}&diabetes={{ request.GET.diabetes }}{% endif %}{% if request.GET.hypertension %}&hypertension={{ request.GET.hypertension }}{% endif %}{% if request.GET.obesity %}&obesity={{ request.GET.obesity }}{% endif %}{% if request.GET.cardiovascular_disease %}&cardiovascular_disease={{ request.GET.cardiovascular_disease }}{% endif %}"
-                    >
-                        صفحه آخر
-                    </a>
+                    <tbody>
 
-                {% endif %}
+                        {% for patient in patients %}
+
+                            <tr>
+
+                                <td>
+                                    <span class="patient-id">
+                                        #{{ patient.id }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    {{ patient.age }} سال
+                                </td>
+
+                                <td>
+
+                                    {% if patient.gender == "male" %}
+
+                                        <span class="gender-badge male">
+                                            <i class="fa-solid fa-mars"></i>
+                                            مرد
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="gender-badge female">
+                                            <i class="fa-solid fa-venus"></i>
+                                            زن
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                                <td>
+                                    <span class="diagnosis">
+                                        {{ patient.psychiatric_diagnosis }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="date-value">
+                                        {{ patient.treatment_start_date|jalali_date }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="date-value">
+                                        {{ patient.last_medication_change|jalali_date }}
+                                    </span>
+                                </td>
+
+                                <td>
+
+                                    <div class="table-actions">
+
+                                        <a
+                                            href="{% url 'patient-detail' patient.pk %}"
+                                            class="action-btn view"
+                                            title="مشاهده پرونده"
+                                        >
+                                            <i class="fa-solid fa-eye"></i>
+                                        </a>
+
+                                        <a
+                                            href="{% url 'patient-edit' patient.pk %}"
+                                            class="action-btn edit"
+                                            title="ویرایش"
+                                        >
+                                            <i class="fa-solid fa-pen"></i>
+                                        </a>
+
+                                        <a
+                                            href="{% url 'patient-delete' patient.pk %}"
+                                            class="action-btn delete"
+                                            title="حذف"
+                                        >
+                                            <i class="fa-solid fa-trash"></i>
+                                        </a>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- =====================================================
+                 Pagination
+                 ===================================================== -->
+
+            {% if is_paginated %}
+
+                <div class="pagination">
+
+                    {% if page_obj.has_previous %}
+
+                        <a
+                            href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}"
+                            class="pagination-btn"
+                        >
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+
+                    {% endif %}
+
+
+                    <div class="pagination-pages">
+
+                        {% for num in page_obj.paginator.page_range %}
+
+                            {% if page_obj.number == num %}
+
+                                <span class="pagination-page active">
+                                    {{ num }}
+                                </span>
+
+                            {% elif num > page_obj.number|add:"-2" and num < page_obj.number|add:"2" %}
+
+                                <a
+                                    href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ num }}"
+                                    class="pagination-page"
+                                >
+                                    {{ num }}
+                                </a>
+
+                            {% endif %}
+
+                        {% endfor %}
+
+                    </div>
+
+
+                    {% if page_obj.has_next %}
+
+                        <a
+                            href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}"
+                            class="pagination-btn"
+                        >
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </a>
+
+                    {% endif %}
+
+                </div>
+
+            {% endif %}
+
+
+        {% else %}
+
+            <!-- =====================================================
+                 Empty State
+                 ===================================================== -->
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    <i class="fa-solid fa-user-slash"></i>
+                </div>
+
+                <h3>
+                    بیماری پیدا نشد
+                </h3>
+
+                <p>
+                    هنوز بیماری با این مشخصات ثبت نشده است.
+                </p>
+
+                <a
+                    href="{% url 'patient-create' %}"
+                    class="page-header-btn"
+                >
+                    <i class="fa-solid fa-user-plus"></i>
+                    ثبت بیمار جدید
+                </a>
 
             </div>
 
         {% endif %}
 
+    </div>
 
-    {% else %}
+</div>
 
-
-        <!-- =================================================
-             هیچ بیماری پیدا نشد
-             ================================================= -->
-
-        <p>
-            هیچ بیماری با این مشخصات پیدا نشد.
-        </p>
+{% endblock %}
 
 
-    {% endif %}
+{% block extra_css %}
+
+<style>
+
+    /* =====================================================
+       Page Header
+       ===================================================== */
+
+    .patients-page {
+        padding-top: 5px;
+    }
+
+    .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 30px;
+        margin-bottom: 25px;
+    }
+
+    .page-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        color: #7C3AED;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    .page-header h1 {
+        margin: 0 0 5px;
+        color: #1E1B4B;
+        font-size: 1.8rem;
+        font-weight: 800;
+    }
+
+    .page-header p {
+        margin: 0;
+        color: #64748B;
+        font-size: 0.85rem;
+    }
+
+    .page-header-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        flex-shrink: 0;
+        background: #7C3AED;
+        color: #FFFFFF;
+        border-radius: 9px;
+        padding: 10px 16px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        transition: 0.2s ease;
+    }
+
+    .page-header-btn:hover {
+        background: #5B21B6;
+        transform: translateY(-1px);
+    }
 
 
-</body>
+    /* =====================================================
+       Filter
+       ===================================================== */
 
-</html>
+    .filter-card {
+        background: #FFFFFF;
+        border: 1px solid #E2E8F0;
+        border-radius: 15px;
+        padding: 22px;
+        margin-bottom: 20px;
+    }
+
+    .filter-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 18px;
+        align-items: end;
+    }
+
+    .search-box,
+    .filter-item {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+    }
+
+    .search-box label,
+    .filter-item label,
+    .filter-label {
+        color: #334155;
+        font-size: 0.78rem;
+        font-weight: 600;
+    }
+
+    .input-with-icon {
+        position: relative;
+    }
+
+    .input-with-icon i {
+        position: absolute;
+        right: 13px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94A3B8;
+        font-size: 0.82rem;
+    }
+
+    .input-with-icon input,
+    .filter-item select {
+        width: 100%;
+        height: 42px;
+        border: 1px solid #E2E8F0;
+        border-radius: 8px;
+        background: #FFFFFF;
+        color: #334155;
+        outline: none;
+        font-size: 0.8rem;
+        transition: 0.2s ease;
+    }
+
+    .input-with-icon input {
+        padding: 0 38px 0 12px;
+    }
+
+    .filter-item select {
+        padding: 0 12px;
+    }
+
+    .input-with-icon input:focus,
+    .filter-item select:focus {
+        border-color: #A78BFA;
+        box-shadow: 0 0 0 3px #F5F3FF;
+    }
+
+    .filter-checks {
+        grid-column: 1 / -1;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        flex-wrap: wrap;
+    }
+
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+
+    .check-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #64748B;
+        font-size: 0.77rem;
+        cursor: pointer;
+    }
+
+    .check-item input {
+        accent-color: #7C3AED;
+        width: 15px;
+        height: 15px;
+        margin: 0;
+    }
+
+    .filter-actions {
+        grid-column: 1 / -1;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 8px;
+    }
+
+    .filter-btn,
+    .clear-btn {
+        height: 39px;
+        border-radius: 8px;
+        padding: 0 15px;
+        font-size: 0.78rem;
+        font-weight: 600;
+    }
+
+    .filter-btn {
+        border: none;
+        background: #7C3AED;
+        color: #FFFFFF;
+    }
+
+    .filter-btn:hover {
+        background: #5B21B6;
+    }
+
+    .clear-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #E2E8F0;
+        background: #FFFFFF;
+        color: #64748B;
+    }
+
+    .clear-btn:hover {
+        background: #F8FAFC;
+        color: #334155;
+    }
+
+
+    /* =====================================================
+       Patients Card
+       ===================================================== */
+
+    .patients-card {
+        background: #FFFFFF;
+        border: 1px solid #E2E8F0;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+
+    .patients-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 22px;
+        border-bottom: 1px solid #E2E8F0;
+    }
+
+    .patients-card-header h2 {
+        margin: 0 0 2px;
+        color: #334155;
+        font-size: 1rem;
+        font-weight: 700;
+    }
+
+    .patients-card-header span {
+        color: #94A3B8;
+        font-size: 0.72rem;
+    }
+
+
+    /* =====================================================
+       Table
+       ===================================================== */
+
+    .table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .patients-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 850px;
+    }
+
+    .patients-table th {
+        padding: 13px 16px;
+        background: #F8FAFC;
+        color: #64748B;
+        border-bottom: 1px solid #E2E8F0;
+        text-align: right;
+        white-space: nowrap;
+        font-size: 0.73rem;
+        font-weight: 600;
+    }
+
+    .patients-table td {
+        padding: 15px 16px;
+        border-bottom: 1px solid #F1F5F9;
+        color: #475569;
+        font-size: 0.78rem;
+        white-space: nowrap;
+    }
+
+    .patients-table tbody tr {
+        transition: background 0.15s ease;
+    }
+
+    .patients-table tbody tr:hover {
+        background: #FAF9FF;
+    }
+
+    .patients-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .patient-id {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 42px;
+        padding: 4px 8px;
+        border-radius: 6px;
+        background: #F5F3FF;
+        color: #7C3AED;
+        font-size: 0.72rem;
+        font-weight: 600;
+    }
+
+    .gender-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 9px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 500;
+    }
+
+    .gender-badge.male {
+        background: #EEF2FF;
+        color: #4F46E5;
+    }
+
+    .gender-badge.female {
+        background: #F5F3FF;
+        color: #7C3AED;
+    }
+
+    .diagnosis {
+        color: #334155;
+        font-weight: 500;
+    }
+
+    .date-value {
+        color: #64748B;
+        font-size: 0.75rem;
+    }
+
+
+    /* =====================================================
+       Actions
+       ===================================================== */
+
+    .table-actions {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .action-btn {
+        width: 31px;
+        height: 31px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 7px;
+        font-size: 0.72rem;
+        transition: 0.2s ease;
+    }
+
+    .action-btn.view {
+        background: #EEF2FF;
+        color: #4F46E5;
+    }
+
+    .action-btn.view:hover {
+        background: #E0E7FF;
+    }
+
+    .action-btn.edit {
+        background: #F5F3FF;
+        color: #7C3AED;
+    }
+
+    .action-btn.edit:hover {
+        background: #EDE9FE;
+    }
+
+    .action-btn.delete {
+        background: #FEF2F2;
+        color: #DC2626;
+    }
+
+    .action-btn.delete:hover {
+        background: #FEE2E2;
+    }
+
+
+    /* =====================================================
+       Pagination
+       ===================================================== */
+
+    .pagination {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 18px;
+        border-top: 1px solid #E2E8F0;
+    }
+
+    .pagination-pages {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .pagination-btn,
+    .pagination-page {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 7px;
+        font-size: 0.72rem;
+        transition: 0.2s ease;
+    }
+
+    .pagination-btn {
+        background: #F8FAFC;
+        color: #64748B;
+    }
+
+    .pagination-btn:hover {
+        background: #EDE9FE;
+        color: #7C3AED;
+    }
+
+    .pagination-page {
+        color: #64748B;
+    }
+
+    .pagination-page:hover {
+        background: #F5F3FF;
+        color: #7C3AED;
+    }
+
+    .pagination-page.active {
+        background: #7C3AED;
+        color: #FFFFFF;
+        font-weight: 600;
+    }
+
+
+    /* =====================================================
+       Empty State
+       ===================================================== */
+
+    .empty-state {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        text-align: center;
+        padding: 70px 20px;
+    }
+
+    .empty-icon {
+        width: 70px;
+        height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 15px;
+        border-radius: 20px;
+        background: #F5F3FF;
+        color: #7C3AED;
+        font-size: 1.7rem;
+    }
+
+    .empty-state h3 {
+        margin: 0 0 5px;
+        color: #334155;
+        font-size: 1rem;
+    }
+
+    .empty-state p {
+        margin: 0 0 20px;
+        color: #94A3B8;
+        font-size: 0.8rem;
+    }
+
+
+    /* =====================================================
+       Responsive
+       ===================================================== */
+
+    @media (max-width: 900px) {
+
+        .filter-row {
+            grid-template-columns: 1fr;
+        }
+
+        .filter-checks,
+        .filter-actions {
+            grid-column: auto;
+        }
+
+    }
+
+
+    @media (max-width: 700px) {
+
+        .page-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .page-header-btn {
+            width: 100%;
+        }
+
+        .filter-card {
+            padding: 17px;
+        }
+
+        .filter-checks {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .filter-actions {
+            width: 100%;
+        }
+
+        .filter-btn,
+        .clear-btn {
+            flex: 1;
+        }
+
+        .patients-card-header {
+            padding: 17px;
+        }
+
+        .pagination {
+            padding: 15px;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
