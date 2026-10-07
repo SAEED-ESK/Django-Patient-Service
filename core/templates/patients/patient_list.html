@@ -32,6 +32,13 @@
             <i class="fa-solid fa-user-plus"></i>
             ثبت بیمار جدید
         </a>
+        <a
+            href="{% url 'patient-export' %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}"
+            class="btn btn-success"
+        >
+            <i class="fas fa-file-excel"></i>
+            خروجی Excel
+        </a>
 
     </div>
 

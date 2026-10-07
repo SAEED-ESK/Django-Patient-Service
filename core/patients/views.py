@@ -8,6 +8,7 @@ from django.views.generic import (
 
 from .forms import PatientForm, PatientMedicationFormSet
 from .models import Patient
+from .exports import export_patients_to_excel
 
 
 class PatientCreateView(LoginRequiredMixin, CreateView):
@@ -234,3 +235,13 @@ class PatientDeleteView(LoginRequiredMixin, DeleteView):
         )
 
         return super().form_valid(form)
+
+class PatientExportView(PatientListView):
+
+    def get(self, request, *args, **kwargs):
+
+        queryset = self.get_queryset()
+
+        return export_patients_to_excel(
+            queryset
+        )
