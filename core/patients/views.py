@@ -46,6 +46,8 @@ class PatientCreateView(LoginRequiredMixin, CreateView):
 
         with transaction.atomic():
 
+            form.instance.created_by = self.request.user
+
             self.object = form.save()
 
             medication_formset.instance = self.object
@@ -60,6 +62,7 @@ class PatientCreateView(LoginRequiredMixin, CreateView):
             "/patients/"
         )
 
+
 # =========================================================
 # ویرایش بیمار
 # =========================================================
@@ -70,6 +73,11 @@ class PatientUpdateView(LoginRequiredMixin, UpdateView):
     form_class = PatientForm
     template_name = "patients/patient_edit.html"
     context_object_name = "patient"
+
+    def get_queryset(self):
+        return Patient.objects.filter(
+            created_by=self.request.user
+        )
 
     def get_context_data(self, **kwargs):
 
@@ -128,7 +136,9 @@ class PatientListView(LoginRequiredMixin, ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = Patient.objects.filter(
+            created_by=self.request.user
+        ).order_by("-created_at")
 
         # -----------------------------------------------------
         # جستجو بر اساس تشخیص روان پزشکی
@@ -193,6 +203,11 @@ class PatientDetailView(LoginRequiredMixin, DetailView):
     # نام آبجکت در Template
     context_object_name = "patient"
 
+    def get_queryset(self):
+        return Patient.objects.filter(
+            created_by=self.request.user
+        )
+
 # =========================================================
 # حذف بیمار
 # =========================================================
@@ -202,6 +217,11 @@ class PatientDeleteView(LoginRequiredMixin, DeleteView):
     model = Patient
     template_name = "patients/patient_confirm_delete.html"
     context_object_name = "patient"
+
+    def get_queryset(self):
+        return Patient.objects.filter(
+            created_by=self.request.user
+        )
 
     def get_success_url(self):
         return "/patients/"

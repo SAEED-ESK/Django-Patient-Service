@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
-
+from django.contrib.auth.models import User
 
 # =========================================================
 # مدل اصلی بیمار
@@ -9,6 +9,12 @@ from django.core.exceptions import ValidationError
 # =========================================================
 
 class Patient(models.Model):
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="patients",
+        verbose_name="ثبت‌کننده",
+    )
 
     # -----------------------------------------------------
     # 1. سن
