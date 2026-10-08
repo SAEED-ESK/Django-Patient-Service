@@ -15,33 +15,67 @@
 
     <div class="page-header">
 
-        <div>
-            <span class="page-eyebrow">
-                <i class="fa-solid fa-users"></i>
-                مدیریت بیماران
-            </span>
+        <div class="page-header-content">
 
-            <h1>پرونده بیماران</h1>
+            <div>
+                <span class="page-eyebrow">
+                    <i class="fa-solid fa-users"></i>
+                    مدیریت بیماران
+                </span>
 
-            <p>
-                مشاهده، جستجو و مدیریت اطلاعات ثبت‌شده بیماران
-            </p>
+                <h1>پرونده بیماران</h1>
+
+                <p>
+                    مشاهده، جستجو و مدیریت اطلاعات ثبت‌شده بیماران
+                </p>
+            </div>
+
         </div>
 
-        <a href="{% url 'patient-create' %}" class="page-header-btn">
-            <i class="fa-solid fa-user-plus"></i>
-            ثبت بیمار جدید
-        </a>
-        <a
-            href="{% url 'patient-export' %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}"
-            class="btn btn-success"
-        >
-            <i class="fas fa-file-excel"></i>
-            خروجی Excel
-        </a>
+
+        <div class="page-header-actions">
+
+            <a
+                href="{% url 'patient-create' %}"
+                class="header-action-btn primary"
+            >
+                <i class="fa-solid fa-user-plus"></i>
+                ثبت بیمار جدید
+            </a>
+
+
+            <a
+                href="{% url 'patient-export' %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}"
+                class="header-action-btn success"
+            >
+                <i class="fa-solid fa-file-excel"></i>
+                خروجی Excel
+            </a>
+
+
+            <form
+                method="post"
+                action="{% url 'patient-bulk-delete' %}"
+                id="bulk-delete-form"
+            >
+                {% csrf_token %}
+
+                <div id="selected-patients"></div>
+
+                <button
+                    type="submit"
+                    id="bulk-delete-btn"
+                    class="header-action-btn danger"
+                    disabled
+                >
+                    <i class="fa-solid fa-trash"></i>
+                    حذف انتخاب‌شده‌ها
+                </button>
+            </form>
+
+        </div>
 
     </div>
-
 
     <!-- =====================================================
          Search & Filters
@@ -212,6 +246,12 @@
                     <thead>
 
                         <tr>
+                            <th>
+                                <input
+                                    type="checkbox"
+                                    id="select-all"
+                                >
+                            </th>
                             <th>شماره</th>
                             <th>سن</th>
                             <th>جنسیت</th>
@@ -228,6 +268,13 @@
                         {% for patient in patients %}
 
                             <tr>
+                                <td>
+                                    <input
+                                        type="checkbox"
+                                        class="patient-checkbox"
+                                        value="{{ patient.pk }}"
+                                    >
+                                </td>
 
                                 <td>
                                     <span class="patient-id">
@@ -404,7 +451,7 @@
 
                 <a
                     href="{% url 'patient-create' %}"
-                    class="page-header-btn"
+                    class="header-action-btn primary"
                 >
                     <i class="fa-solid fa-user-plus"></i>
                     ثبت بیمار جدید
@@ -464,24 +511,74 @@
         font-size: 0.85rem;
     }
 
-    .page-header-btn {
+    .page-header-content {
+    flex: 1;
+    }
+
+    .page-header-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    .page-header-actions form {
+        margin: 0;
+    }
+
+    .header-action-btn {
+        height: 39px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 8px;
-        flex-shrink: 0;
-        background: #7C3AED;
-        color: #FFFFFF;
-        border-radius: 9px;
-        padding: 10px 16px;
-        font-size: 0.82rem;
+        gap: 7px;
+        padding: 0 14px;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.78rem;
         font-weight: 600;
+        white-space: nowrap;
+        cursor: pointer;
         transition: 0.2s ease;
     }
 
-    .page-header-btn:hover {
+    .header-action-btn.primary {
+        background: #7C3AED;
+        color: #FFFFFF;
+    }
+
+    .header-action-btn.primary:hover {
         background: #5B21B6;
         transform: translateY(-1px);
+    }
+
+    .header-action-btn.success {
+        background: #ECFDF5;
+        color: #059669;
+        border: 1px solid #A7F3D0;
+    }
+
+    .header-action-btn.success:hover {
+        background: #D1FAE5;
+        color: #047857;
+    }
+
+    .header-action-btn.danger {
+        background: #FEF2F2;
+        color: #DC2626;
+        border: 1px solid #FECACA;
+    }
+
+    .header-action-btn.danger:hover:not(:disabled) {
+        background: #FEE2E2;
+        color: #B91C1C;
+    }
+
+    .header-action-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
     }
 
 
@@ -923,7 +1020,17 @@
             flex-direction: column;
         }
 
-        .page-header-btn {
+        .page-header-actions {
+            width: 100%;
+            flex-direction: column;
+        }
+
+        .header-action-btn,
+        .page-header-actions form {
+            width: 100%;
+        }
+
+        .page-header-actions form .header-action-btn {
             width: 100%;
         }
 
@@ -955,7 +1062,131 @@
         }
 
     }
+        .filter-card {
+            padding: 17px;
+        }
+
+        .filter-checks {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .filter-actions {
+            width: 100%;
+        }
+
+        .filter-btn,
+        .clear-btn {
+            flex: 1;
+        }
+
+        .patients-card-header {
+            padding: 17px;
+        }
+
+        .pagination {
+            padding: 15px;
+        }
+
+    }
 
 </style>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+    const selectAll = document.getElementById("select-all");
+    const checkboxes = document.querySelectorAll(".patient-checkbox");
+    const deleteButton = document.getElementById("bulk-delete-btn");
+    const deleteForm = document.getElementById("bulk-delete-form");
+    const selectedPatients = document.getElementById("selected-patients");
+
+
+    function updateDeleteButton() {
+
+        const selected = document.querySelectorAll(
+            ".patient-checkbox:checked"
+        );
+
+        deleteButton.disabled = selected.length === 0;
+    }
+
+
+    selectAll.addEventListener("change", function () {
+
+        checkboxes.forEach(function (checkbox) {
+
+            checkbox.checked = selectAll.checked;
+
+        });
+
+        updateDeleteButton();
+    });
+
+
+    checkboxes.forEach(function (checkbox) {
+
+        checkbox.addEventListener("change", function () {
+
+            const allSelected =
+                document.querySelectorAll(
+                    ".patient-checkbox:checked"
+                ).length === checkboxes.length;
+
+            selectAll.checked = allSelected;
+
+            updateDeleteButton();
+        });
+
+    });
+
+
+    deleteForm.addEventListener("submit", function (event) {
+
+        const selected = document.querySelectorAll(
+            ".patient-checkbox:checked"
+        );
+
+        if (selected.length === 0) {
+
+            event.preventDefault();
+
+            return;
+        }
+
+
+        const confirmed = confirm(
+            `آیا از حذف ${selected.length} بیمار انتخاب‌شده مطمئن هستید؟`
+        );
+
+
+        if (!confirmed) {
+
+            event.preventDefault();
+
+            return;
+        }
+
+
+        selectedPatients.innerHTML = "";
+
+
+        selected.forEach(function (checkbox) {
+
+            const input = document.createElement("input");
+
+            input.type = "hidden";
+            input.name = "patient_ids";
+            input.value = checkbox.value;
+
+            selectedPatients.appendChild(input);
+
+        });
+
+    });
+</script>
 
 {% endblock %}

@@ -236,6 +236,49 @@ class PatientDeleteView(LoginRequiredMixin, DeleteView):
 
         return super().form_valid(form)
 
+from django.contrib import messages
+from django.db import transaction
+from django.shortcuts import redirect
+from django.views.generic import View
+
+
+class PatientBulkDeleteView(LoginRequiredMixin, View):
+
+    def post(self, request, *args, **kwargs):
+
+        patient_ids = request.POST.getlist("patient_ids")
+
+        if not patient_ids:
+            messages.warning(
+                request,
+                "هیچ بیماری برای حذف انتخاب نشده است."
+            )
+            return redirect("patient-list")
+
+        queryset = Patient.objects.filter(
+            id__in=patient_ids,
+            created_by=request.user,
+        )
+
+        count = queryset.count()
+
+        if count == 0:
+            messages.warning(
+                request,
+                "بیمار انتخاب‌شده‌ای برای حذف پیدا نشد."
+            )
+            return redirect("patient-list")
+
+        with transaction.atomic():
+            queryset.delete()
+
+        messages.success(
+            request,
+            f"{count} بیمار با موفقیت حذف شد."
+        )
+
+        return redirect("patient-list")
+
 class PatientExportView(PatientListView):
 
     def get(self, request, *args, **kwargs):

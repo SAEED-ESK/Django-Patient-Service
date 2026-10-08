@@ -1,6 +1,7 @@
 from django.urls import path
 
 from .views import (
+    PatientBulkDeleteView,
     PatientCreateView,
     PatientDeleteView,
     PatientExportView,
@@ -29,6 +30,11 @@ urlpatterns = [
         "export/",
         PatientExportView.as_view(),
         name="patient-export",
+    ),
+    path(
+        "bulk-delete/",
+        PatientBulkDeleteView.as_view(),
+        name="patient-bulk-delete",
     ),
     # جزئیات بیمار
     path(
