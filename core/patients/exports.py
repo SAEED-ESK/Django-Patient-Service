@@ -37,6 +37,7 @@ def export_patients_to_excel(queryset):
         "ECG",
 
         "انطباق کلی",
+        "پلی‌فارماسی",
 
         "داروها",
 
@@ -93,6 +94,8 @@ def export_patients_to_excel(queryset):
             patient.get_ecg_status(),
 
             patient.get_overall_compliance(),
+
+            "دارد" if patient.is_polypharmacy else "ندارد",
 
             "\n".join(medications) if medications else "بدون دارو",
 
