@@ -126,3 +126,5 @@ log.django
 
 # postgre data
 postgre/*
+
+/backups/

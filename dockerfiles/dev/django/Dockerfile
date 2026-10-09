@@ -1,10 +1,12 @@
-FROM python:3.9-slim-buster
-
-LABEL maintainer="bigdeli.ali3@gmail.com"
+FROM python:3.9-slim
 
 ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt /app/
 

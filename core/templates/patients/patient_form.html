@@ -1,0 +1,2034 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    ثبت بیمار | سامانه مدیریت بیماران
+{% endblock %}
+
+{% block content %}
+
+<div class="patient-form-page">
+
+    <!-- Page Header -->
+    <div class="page-header">
+
+        <div>
+            <span class="page-eyebrow">
+                <i class="fa-solid fa-user-plus"></i>
+                پرونده جدید
+            </span>
+
+            <h1>ثبت بیمار جدید</h1>
+
+            <p>
+                اطلاعات بیمار، داروهای مصرفی و وضعیت پایش درمان را ثبت کنید.
+            </p>
+        </div>
+
+        <a href="{% url 'patient-list' %}" class="back-btn">
+            <i class="fa-solid fa-arrow-right"></i>
+            بازگشت به لیست
+        </a>
+
+    </div>
+
+
+    <form method="post" novalidate>
+
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+
+            <div class="form-alert">
+                <i class="fa-solid fa-circle-exclamation"></i>
+
+                <div>
+                    {% for error in form.non_field_errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+        {% endif %}
+
+
+        <!-- اطلاعات پایه -->
+
+        <section class="form-section">
+
+            <div class="section-heading">
+
+                <div class="section-icon">
+                    <i class="fa-solid fa-id-card"></i>
+                </div>
+
+                <div>
+                    <h2>اطلاعات پایه</h2>
+                    <p>مشخصات اولیه بیمار را وارد کنید.</p>
+                </div>
+
+            </div>
+
+
+            <div class="form-grid basic-grid">
+
+                <!-- سن -->
+
+                <div class="field small-field">
+
+                    <label for="{{ form.age.id_for_label }}">
+                        {{ form.age.label }}
+                    </label>
+
+                    {{ form.age }}
+
+                    {% if form.age.errors %}
+                        <div class="field-error">
+                            {{ form.age.errors.0 }}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+
+                <!-- جنسیت -->
+
+                <div class="field small-field">
+
+                    <label for="{{ form.gender.id_for_label }}">
+                        {{ form.gender.label }}
+                    </label>
+
+                    {{ form.gender }}
+
+                    {% if form.gender.errors %}
+                        <div class="field-error">
+                            {{ form.gender.errors.0 }}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+
+                <!-- تشخیص -->
+
+                <div class="field diagnosis-field">
+
+                    <label for="{{ form.psychiatric_diagnosis.id_for_label }}">
+                        {{ form.psychiatric_diagnosis.label }}
+                    </label>
+
+                    {{ form.psychiatric_diagnosis }}
+
+                    {% if form.psychiatric_diagnosis.errors %}
+                        <div class="field-error">
+                            {{ form.psychiatric_diagnosis.errors.0 }}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- بیماری‌های همراه -->
+
+        <section class="form-section">
+
+            <div class="section-heading">
+
+                <div class="section-icon">
+                    <i class="fa-solid fa-heart-pulse"></i>
+                </div>
+
+                <div>
+                    <h2>بیماری‌های همراه</h2>
+                    <p>
+                        بیماری‌های متابولیک و قلبی عروقی بیمار را مشخص کنید.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="checkbox-grid">
+
+                <label class="check-card">
+
+                    {{ form.diabetes }}
+
+                    <span class="check-box">
+                        <i class="fa-solid fa-check"></i>
+                    </span>
+
+                    <span class="check-content">
+                        <strong>دیابت</strong>
+                        <small>Diabetes</small>
+                    </span>
+
+                </label>
+
+
+                <label class="check-card">
+
+                    {{ form.hypertension }}
+
+                    <span class="check-box">
+                        <i class="fa-solid fa-check"></i>
+                    </span>
+
+                    <span class="check-content">
+                        <strong>پرفشاری خون</strong>
+                        <small>Hypertension</small>
+                    </span>
+
+                </label>
+
+
+                <label class="check-card">
+
+                    {{ form.dyslipidemia }}
+
+                    <span class="check-box">
+                        <i class="fa-solid fa-check"></i>
+                    </span>
+
+                    <span class="check-content">
+                        <strong>دیس‌لیپیدمی</strong>
+                        <small>Dyslipidemia</small>
+                    </span>
+
+                </label>
+
+
+                <label class="check-card">
+
+                    {{ form.obesity }}
+
+                    <span class="check-box">
+                        <i class="fa-solid fa-check"></i>
+                    </span>
+
+                    <span class="check-content">
+                        <strong>چاقی</strong>
+                        <small>Obesity</small>
+                    </span>
+
+                </label>
+
+
+                <label class="check-card">
+
+                    {{ form.cardiovascular_disease }}
+
+                    <span class="check-box">
+                        <i class="fa-solid fa-check"></i>
+                    </span>
+
+                    <span class="check-content">
+                        <strong>بیماری قلبی عروقی</strong>
+                        <small>Cardiovascular Disease</small>
+                    </span>
+
+                </label>
+
+            </div>
+
+        </section>
+
+
+        <!-- اطلاعات درمان -->
+
+        <section class="form-section">
+
+            <div class="section-heading">
+
+                <div class="section-icon">
+                    <i class="fa-solid fa-calendar-check"></i>
+                </div>
+
+                <div>
+                    <h2>اطلاعات درمان</h2>
+                    <p>
+                        تاریخ‌های مرتبط با شروع درمان و تغییر دارو را ثبت کنید.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="form-grid">
+
+                <!-- تاریخ شروع -->
+
+                <div class="field">
+
+                    <label for="{{ form.treatment_start_date.id_for_label }}">
+                        {{ form.treatment_start_date.label }}
+                    </label>
+
+                    <div class="date-input-wrapper">
+
+                        <input
+                            type="text"
+                            name="{{ form.treatment_start_date.html_name }}"
+                            id="{{ form.treatment_start_date.id_for_label }}"
+                            value="{{ form.treatment_start_date.value|default:'' }}"
+                            placeholder="1405/07/15"
+                            autocomplete="off"
+                            data-jdp
+                        >
+
+                        <i class="fa-regular fa-calendar-days"></i>
+
+                    </div>
+
+
+                    <small class="field-help">
+                        تاریخ را از تقویم شمسی انتخاب کنید.
+                    </small>
+
+                    {% if form.treatment_start_date.errors %}
+                        <div class="field-error">
+                            {{ form.treatment_start_date.errors.0 }}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+
+                <!-- آخرین تغییر -->
+
+                <div class="field">
+
+                    <label for="{{ form.last_medication_change.id_for_label }}">
+                        {{ form.last_medication_change.label }}
+                    </label>
+
+                    <div class="date-input-wrapper">
+
+                        <input
+                            type="text"
+                            name="{{ form.last_medication_change.html_name }}"
+                            id="{{ form.last_medication_change.id_for_label }}"
+                            value="{{ form.last_medication_change.value|default:'' }}"
+                            placeholder="1405/07/15"
+                            autocomplete="off"
+                            data-jdp
+                        >
+
+                        <i class="fa-regular fa-calendar-days"></i>
+
+                    </div>
+
+                    <small class="field-help">
+                        تاریخ آخرین تغییر دارو یا دوز را انتخاب کنید.
+                    </small>
+
+                    {% if form.last_medication_change.errors %}
+                        <div class="field-error">
+                            {{ form.last_medication_change.errors.0 }}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- داروها -->
+
+        <section class="form-section">
+
+            <div class="section-heading">
+
+                <div class="section-icon">
+                    <i class="fa-solid fa-pills"></i>
+                </div>
+
+                <div>
+                    <h2>داروهای مصرفی</h2>
+                    <p>
+                        حداقل یک آنتی‌سایکوتیک نسل دوم برای بیمار ثبت کنید.
+                    </p>
+                </div>
+
+            </div>
+
+
+            {{ medication_formset.management_form }}
+
+
+            <div id="medication-forms">
+
+                {% for medication_form in medication_formset %}
+
+                    <div class="medication-form-card">
+
+                        {% for hidden in medication_form.hidden_fields %}
+                            {{ hidden }}
+                        {% endfor %}
+
+
+                        <div class="medication-card-header">
+
+                            <div class="medication-number">
+
+                                <span class="medication-index">
+                                    {{ forloop.counter }}
+                                </span>
+
+                                <div>
+                                    <strong>
+                                        داروی {{ forloop.counter }}
+                                    </strong>
+
+                                    <small>
+                                        اطلاعات دارو و دوز مصرفی
+                                    </small>
+                                </div>
+
+                            </div>
+
+
+                            {% if medication_form.DELETE %}
+
+                                <label class="delete-medication">
+
+                                    {{ medication_form.DELETE }}
+
+                                    <span>
+                                        <i class="fa-solid fa-trash"></i>
+                                        حذف دارو
+                                    </span>
+
+                                </label>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <div class="form-grid medication-grid">
+
+                            <div class="field">
+
+                                <label>
+                                    {{ medication_form.drug.label }}
+                                </label>
+
+                                {{ medication_form.drug }}
+
+                                {% if medication_form.drug.errors %}
+                                    <div class="field-error">
+                                        {{ medication_form.drug.errors.0 }}
+                                    </div>
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label>
+                                    {{ medication_form.dose.label }}
+                                </label>
+
+                                {{ medication_form.dose }}
+
+                                {% if medication_form.dose.errors %}
+                                    <div class="field-error">
+                                        {{ medication_form.dose.errors.0 }}
+                                    </div>
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label>
+                                    {{ medication_form.form.label }}
+                                </label>
+
+                                {{ medication_form.form }}
+
+                                {% if medication_form.form.errors %}
+                                    <div class="field-error">
+                                        {{ medication_form.form.errors.0 }}
+                                    </div>
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+
+            <button type="button" id="add-medication" class="add-medication-btn">
+
+                <i class="fa-solid fa-plus"></i>
+
+                افزودن داروی دیگر
+
+            </button>
+
+
+            <!-- Empty Form -->
+
+            <div id="empty-medication-form" style="display: none;">
+
+                <div class="medication-form-card">
+
+                    <div class="medication-card-header">
+
+                        <div class="medication-number">
+
+                            <span class="medication-index">
+                                0
+                            </span>
+
+                            <div>
+                                <strong>دارو</strong>
+                                <small>
+                                    اطلاعات دارو و دوز مصرفی
+                                </small>
+                            </div>
+
+                        </div>
+
+
+                        <label class="delete-medication">
+
+                            {{ medication_formset.empty_form.DELETE }}
+
+                            <span>
+                                <i class="fa-solid fa-trash"></i>
+                                حذف دارو
+                            </span>
+
+                        </label>
+
+                    </div>
+
+
+                    {% for hidden in medication_formset.empty_form.hidden_fields %}
+                        {{ hidden }}
+                    {% endfor %}
+
+
+                    <div class="form-grid medication-grid">
+
+                        <div class="field">
+
+                            <label>
+                                {{ medication_formset.empty_form.drug.label }}
+                            </label>
+
+                            {{ medication_formset.empty_form.drug }}
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label>
+                                {{ medication_formset.empty_form.dose.label }}
+                            </label>
+
+                            {{ medication_formset.empty_form.dose }}
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label>
+                                {{ medication_formset.empty_form.form.label }}
+                            </label>
+
+                            {{ medication_formset.empty_form.form }}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- پایش درمان -->
+
+        <section class="form-section">
+
+            <div class="section-heading">
+
+                <div class="section-icon">
+                    <i class="fa-solid fa-stethoscope"></i>
+                </div>
+
+                <div>
+                    <h2>پایش درمان</h2>
+                    <p>
+                        موارد پایش انجام‌شده را بر اساس برنامه درمانی مشخص کنید.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="monitoring-form-grid">
+
+
+                <!-- وزن -->
+
+                <div class="monitor-form-card">
+
+                    <div class="monitor-form-header">
+
+                        <div class="monitor-form-icon">
+                            <i class="fa-solid fa-weight-scale"></i>
+                        </div>
+
+                        <div>
+                            <strong>وزن / BMI</strong>
+                            <small>پایش وزن و شاخص توده بدنی</small>
+                        </div>
+
+                    </div>
+
+
+                    <div class="monitor-options">
+
+                        <label>
+                            {{ form.weight_before_treatment }}
+                            <span>قبل از درمان</span>
+                        </label>
+
+                        <label>
+                            {{ form.weight_week_1 }}
+                            <span>هفته اول</span>
+                        </label>
+
+                        <label>
+                            {{ form.weight_week_2 }}
+                            <span>هفته دوم</span>
+                        </label>
+
+                        <label>
+                            {{ form.weight_week_3 }}
+                            <span>هفته سوم</span>
+                        </label>
+
+                        <label>
+                            {{ form.weight_week_4 }}
+                            <span>هفته چهارم</span>
+                        </label>
+
+                        <label>
+                            {{ form.weight_week_5 }}
+                            <span>هفته پنجم</span>
+                        </label>
+
+                        <label>
+                            {{ form.weight_week_6 }}
+                            <span>هفته ششم</span>
+                        </label>
+
+                        <label>
+                            {{ form.weight_week_12 }}
+                            <span>هفته دوازدهم</span>
+                        </label>
+
+                        <label>
+                            {{ form.weight_year_1 }}
+                            <span>سال اول</span>
+                        </label>
+
+                        <label>
+                            {{ form.weight_annually }}
+                            <span>سالانه</span>
+                        </label>
+
+                        <label class="not-indicated">
+                            {{ form.weight_not_indicated }}
+                            <span>فاقد اندیکاسیون</span>
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+                <!-- دور کمر -->
+
+                <div class="monitor-form-card">
+
+                    <div class="monitor-form-header">
+
+                        <div class="monitor-form-icon">
+                            <i class="fa-solid fa-ruler-horizontal"></i>
+                        </div>
+
+                        <div>
+                            <strong>دور کمر</strong>
+                            <small>پایش دور کمر</small>
+                        </div>
+
+                    </div>
+
+
+                    <div class="monitor-options">
+
+                        <label>
+                            {{ form.waist_before_treatment }}
+                            <span>قبل از درمان</span>
+                        </label>
+
+                        <label>
+                            {{ form.waist_year_1 }}
+                            <span>سال اول</span>
+                        </label>
+
+                        <label>
+                            {{ form.waist_annually }}
+                            <span>سالانه</span>
+                        </label>
+
+                        <label class="not-indicated">
+                            {{ form.waist_not_indicated }}
+                            <span>فاقد اندیکاسیون</span>
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+                <!-- فشار خون -->
+
+                <div class="monitor-form-card">
+
+                    <div class="monitor-form-header">
+
+                        <div class="monitor-form-icon">
+                            <i class="fa-solid fa-heart-pulse"></i>
+                        </div>
+
+                        <div>
+                            <strong>فشار خون / نبض</strong>
+                            <small>پایش فشار خون و ضربان قلب</small>
+                        </div>
+
+                    </div>
+
+
+                    <div class="monitor-options">
+
+                        <label>
+                            {{ form.blood_pressure_before_treatment }}
+                            <span>قبل از درمان</span>
+                        </label>
+
+                        <label>
+                            {{ form.blood_pressure_week_12 }}
+                            <span>هفته دوازدهم</span>
+                        </label>
+
+                        <label>
+                            {{ form.blood_pressure_year_1 }}
+                            <span>سال اول</span>
+                        </label>
+
+                        <label>
+                            {{ form.blood_pressure_annually }}
+                            <span>سالانه</span>
+                        </label>
+
+                        <label class="not-indicated">
+                            {{ form.blood_pressure_not_indicated }}
+                            <span>فاقد اندیکاسیون</span>
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+                <!-- قند -->
+
+                <div class="monitor-form-card">
+
+                    <div class="monitor-form-header">
+
+                        <div class="monitor-form-icon">
+                            <i class="fa-solid fa-vial"></i>
+                        </div>
+
+                        <div>
+                            <strong>قند خون / HbA1c</strong>
+                            <small>پایش قند خون</small>
+                        </div>
+
+                    </div>
+
+
+                    <div class="monitor-options">
+
+                        <label>
+                            {{ form.glucose_before_treatment }}
+                            <span>قبل از درمان</span>
+                        </label>
+
+                        <label>
+                            {{ form.glucose_week_12 }}
+                            <span>هفته دوازدهم</span>
+                        </label>
+
+                        <label>
+                            {{ form.glucose_year_1 }}
+                            <span>سال اول</span>
+                        </label>
+
+                        <label>
+                            {{ form.glucose_annually }}
+                            <span>سالانه</span>
+                        </label>
+
+                        <label class="not-indicated">
+                            {{ form.glucose_not_indicated }}
+                            <span>فاقد اندیکاسیون</span>
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+                <!-- لیپید -->
+
+                <div class="monitor-form-card">
+
+                    <div class="monitor-form-header">
+
+                        <div class="monitor-form-icon">
+                            <i class="fa-solid fa-chart-column"></i>
+                        </div>
+
+                        <div>
+                            <strong>پروفایل لیپیدی</strong>
+                            <small>پایش چربی خون</small>
+                        </div>
+
+                    </div>
+
+
+                    <div class="monitor-options">
+
+                        <label>
+                            {{ form.lipid_before_treatment }}
+                            <span>قبل از درمان</span>
+                        </label>
+
+                        <label>
+                            {{ form.lipid_week_12 }}
+                            <span>هفته دوازدهم</span>
+                        </label>
+
+                        <label>
+                            {{ form.lipid_year_1 }}
+                            <span>سال اول</span>
+                        </label>
+
+                        <label>
+                            {{ form.lipid_annually }}
+                            <span>سالانه</span>
+                        </label>
+
+                        <label class="not-indicated">
+                            {{ form.lipid_not_indicated }}
+                            <span>فاقد اندیکاسیون</span>
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+                <!-- پرولاکتین -->
+
+                <div class="monitor-form-card">
+
+                    <div class="monitor-form-header">
+
+                        <div class="monitor-form-icon">
+                            <i class="fa-solid fa-flask"></i>
+                        </div>
+
+                        <div>
+                            <strong>پرولاکتین</strong>
+                            <small>پایش سطح پرولاکتین</small>
+                        </div>
+
+                    </div>
+
+
+                    <div class="monitor-options">
+
+                        <label>
+                            {{ form.prolactin_before_treatment }}
+                            <span>قبل از درمان</span>
+                        </label>
+
+                        <label>
+                            {{ form.prolactin_clinical_need }}
+                            <span>در صورت نیاز بالینی</span>
+                        </label>
+
+                        <label>
+                            {{ form.prolactin_week_12 }}
+                            <span>هفته دوازدهم</span>
+                        </label>
+
+                        <label>
+                            {{ form.prolactin_year_1 }}
+                            <span>سال اول</span>
+                        </label>
+
+                        <label>
+                            {{ form.prolactin_symptoms }}
+                            <span>در صورت علائم</span>
+                        </label>
+
+                        <label class="not-indicated">
+                            {{ form.prolactin_not_indicated }}
+                            <span>فاقد اندیکاسیون</span>
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+                <!-- اختلالات حرکتی -->
+
+                <div class="monitor-form-card">
+
+                    <div class="monitor-form-header">
+
+                        <div class="monitor-form-icon">
+                            <i class="fa-solid fa-person-walking"></i>
+                        </div>
+
+                        <div>
+                            <strong>اختلالات حرکتی</strong>
+                            <small>پایش اختلالات حرکتی</small>
+                        </div>
+
+                    </div>
+
+
+                    <div class="monitor-options">
+
+                        <label>
+                            {{ form.movement_before_treatment }}
+                            <span>قبل از درمان</span>
+                        </label>
+
+                        <label>
+                            {{ form.movement_weekly }}
+                            <span>هفتگی</span>
+                        </label>
+
+                        <label>
+                            {{ form.movement_week_12 }}
+                            <span>هفته دوازدهم</span>
+                        </label>
+
+                        <label>
+                            {{ form.movement_year_1 }}
+                            <span>سال اول</span>
+                        </label>
+
+                        <label>
+                            {{ form.movement_periodically }}
+                            <span>دوره‌ای</span>
+                        </label>
+
+                        <label class="not-indicated">
+                            {{ form.movement_not_indicated }}
+                            <span>فاقد اندیکاسیون</span>
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ECG -->
+
+                <div class="monitor-form-card">
+
+                    <div class="monitor-form-header">
+
+                        <div class="monitor-form-icon">
+                            <i class="fa-solid fa-wave-square"></i>
+                        </div>
+
+                        <div>
+                            <strong>ECG</strong>
+                            <small>الکتروکاردیوگرام</small>
+                        </div>
+
+                    </div>
+
+
+                    <div class="monitor-options">
+
+                        <label>
+                            {{ form.ecg_before_treatment }}
+                            <span>قبل از درمان</span>
+                        </label>
+
+                        <label class="not-indicated">
+                            {{ form.ecg_not_indicated }}
+                            <span>فاقد اندیکاسیون</span>
+                        </label>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- توضیحات -->
+
+        <section class="form-section">
+
+            <div class="section-heading">
+
+                <div class="section-icon">
+                    <i class="fa-solid fa-note-sticky"></i>
+                </div>
+
+                <div>
+                    <h2>توضیحات</h2>
+                    <p>
+                        در صورت نیاز توضیحات تکمیلی پرونده را ثبت کنید.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="field">
+                {{ form.notes }}
+            </div>
+
+        </section>
+
+
+        <!-- Actions -->
+
+        <div class="form-actions">
+
+            <a href="{% url 'patient-list' %}" class="cancel-btn">
+                انصراف
+            </a>
+
+            <button type="submit" class="submit-btn">
+
+                <i class="fa-solid fa-check"></i>
+
+                ثبت پرونده بیمار
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_css %}
+
+<!-- Persian Datepicker -->
+
+
+<link rel="stylesheet" href="{% static 'vendor/jalalidatepicker/jalalidatepicker.min.css' %}">
+
+
+<style>
+
+/* Page */
+
+.patient-form-page {
+    padding: 10px 0 50px;
+}
+
+
+/* Header */
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 25px;
+    margin-bottom: 25px;
+}
+
+.page-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: #7652b5;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.page-header h1 {
+    margin: 0;
+    color: #292333;
+    font-size: 27px;
+}
+
+.page-header p {
+    margin: 7px 0 0;
+    color: #94909c;
+    font-size: 12px;
+}
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #77717f;
+    font-size: 12px;
+}
+
+.back-btn:hover {
+    color: #6c4ab6;
+}
+
+
+/* Alert */
+
+.form-alert {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 15px 18px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    background: #fff0f1;
+    border: 1px solid #f2d1d5;
+    color: #b84752;
+    font-size: 12px;
+}
+
+.form-alert > i {
+    font-size: 18px;
+}
+
+
+/* Sections */
+
+.form-section {
+    background: #fff;
+    border: 1px solid #eeeaf4;
+    border-radius: 17px;
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 18px rgba(52, 39, 77, 0.035);
+}
+
+.section-heading {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding-bottom: 20px;
+    margin-bottom: 22px;
+    border-bottom: 1px solid #f0edf4;
+}
+
+.section-icon {
+    width: 43px;
+    height: 43px;
+    border-radius: 12px;
+    background: #f2ecfb;
+    color: #6c4ab6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.section-heading h2 {
+    margin: 0 0 3px;
+    color: #302b3b;
+    font-size: 17px;
+}
+
+.section-heading p {
+    margin: 0;
+    color: #9a96a2;
+    font-size: 11px;
+}
+
+
+/* Form Grid */
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+}
+
+
+/*
+    اطلاعات پایه:
+    سن و جنسیت کوچک‌تر هستند،
+    تشخیص فضای بیشتری دارد.
+*/
+
+.basic-grid {
+    grid-template-columns: 160px 160px 1fr;
+    align-items: start;
+}
+
+.small-field {
+    max-width: 160px;
+}
+
+.diagnosis-field {
+    min-width: 0;
+}
+
+
+/* Fields */
+
+.field label {
+    display: block;
+    margin-bottom: 8px;
+    color: #514b58;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.field input:not([type="checkbox"]),
+.field select,
+.field textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #e4e0e9;
+    border-radius: 10px;
+    background: #fcfbfd;
+    padding: 11px 13px;
+    color: #393440;
+    font-family: inherit;
+    font-size: 12px;
+    outline: none;
+    transition: 0.2s;
+}
+
+.field input:not([type="checkbox"]):focus,
+.field select:focus,
+.field textarea:focus {
+    border-color: #a98bd5;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(108, 74, 182, 0.08);
+}
+
+.field textarea {
+    min-height: 130px;
+    resize: vertical;
+    line-height: 1.9;
+}
+
+.field-help {
+    display: block;
+    margin-top: 6px;
+    color: #aaa5b0;
+    font-size: 10px;
+}
+
+.field-error {
+    margin-top: 6px;
+    color: #c34e59;
+    font-size: 11px;
+}
+
+
+/* Jalali Date */
+
+.date-input-wrapper {
+    position: relative;
+}
+
+.date-input-wrapper input {
+    padding-left: 42px !important;
+    cursor: pointer;
+}
+
+.date-input-wrapper > i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #8060bb;
+    pointer-events: none;
+}
+
+
+/* Check Cards */
+
+.checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.check-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 15px;
+    border: 1px solid #eeeaf3;
+    border-radius: 12px;
+    background: #fcfbfd;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.check-card:hover {
+    border-color: #d9c9ef;
+    background: #faf7ff;
+}
+
+.check-card input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.check-box {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    border: 1px solid #d8d3df;
+    border-radius: 6px;
+    background: white;
+    color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    transition: 0.2s;
+}
+
+.check-card input:checked + .check-box {
+    background: #6c4ab6;
+    border-color: #6c4ab6;
+    color: white;
+}
+
+.check-content strong {
+    display: block;
+    color: #45404c;
+    font-size: 12px;
+}
+
+.check-content small {
+    display: block;
+    margin-top: 2px;
+    color: #aaa5b0;
+    font-size: 9px;
+}
+
+
+/* Medication */
+
+.medication-form-card {
+    border: 1px solid #ebe7f1;
+    border-radius: 14px;
+    padding: 18px;
+    background: #fcfbfd;
+    margin-bottom: 12px;
+    transition: 0.2s;
+}
+
+.medication-form-card.deleted {
+    display: none;
+}
+
+.medication-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.medication-number {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+.medication-number > span {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    background: #eee7fa;
+    color: #6c4ab6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 12px;
+}
+
+.medication-number strong,
+.medication-number small {
+    display: block;
+}
+
+.medication-number strong {
+    color: #443d4c;
+    font-size: 12px;
+}
+
+.medication-number small {
+    color: #9c97a3;
+    font-size: 10px;
+    margin-top: 2px;
+}
+
+
+/* Delete */
+
+.delete-medication {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    color: #bd5962;
+    font-size: 11px;
+}
+
+.delete-medication input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.delete-medication span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 10px;
+    border-radius: 8px;
+    transition: 0.2s;
+}
+
+.delete-medication span:hover {
+    background: #fff0f1;
+    color: #a73e48;
+}
+
+.delete-medication input:checked + span {
+    background: #fff0f1;
+    color: #a73e48;
+}
+
+
+/* Medication Grid */
+
+.medication-grid {
+    grid-template-columns: 1.5fr 1fr 1fr;
+}
+
+.add-medication-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 15px;
+    border: 1px dashed #b9a5d8;
+    border-radius: 10px;
+    background: #faf7ff;
+    color: #6c4ab6;
+    font-family: inherit;
+    font-size: 11px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.add-medication-btn:hover {
+    background: #f2ecfb;
+    border-color: #9272c5;
+}
+
+
+/* Monitoring */
+
+.monitoring-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+}
+
+.monitor-form-card {
+    border: 1px solid #eeeaf3;
+    border-radius: 14px;
+    padding: 17px;
+    background: #fcfbfd;
+}
+
+.monitor-form-header {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin-bottom: 16px;
+}
+
+.monitor-form-icon {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: 11px;
+    background: #eee7fa;
+    color: #6c4ab6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.monitor-form-header strong,
+.monitor-form-header small {
+    display: block;
+}
+
+.monitor-form-header strong {
+    color: #423c49;
+    font-size: 13px;
+}
+
+.monitor-form-header small {
+    margin-top: 3px;
+    color: #9d98a4;
+    font-size: 10px;
+}
+
+.monitor-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 7px;
+}
+
+.monitor-options label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 9px;
+    border-radius: 8px;
+    color: #706a77;
+    font-size: 10px;
+    cursor: pointer;
+}
+
+.monitor-options label:hover {
+    background: #f6f2fa;
+}
+
+.monitor-options input {
+    accent-color: #6c4ab6;
+}
+
+.monitor-options .not-indicated {
+    color: #8b6570;
+    background: #fff6f7;
+}
+
+.monitor-options .not-indicated:hover {
+    background: #fff0f2;
+}
+
+
+/* Actions */
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.cancel-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 11px 20px;
+    border-radius: 10px;
+    color: #77717f;
+    background: #f5f3f7;
+    font-size: 12px;
+}
+
+.cancel-btn:hover {
+    background: #ece9f0;
+}
+
+.submit-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: none;
+    border-radius: 10px;
+    padding: 11px 22px;
+    background: #6c4ab6;
+    color: white;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.submit-btn:hover {
+    background: #593a9d;
+    transform: translateY(-1px);
+}
+
+
+/* Responsive */
+
+@media (max-width: 900px) {
+
+    .basic-grid {
+        grid-template-columns: 140px 140px 1fr;
+    }
+
+    .checkbox-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .monitoring-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .page-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .form-grid,
+    .medication-grid,
+    .basic-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .small-field {
+        max-width: none;
+    }
+
+    .checkbox-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-section {
+        padding: 18px;
+    }
+
+}
+
+
+@media (max-width: 500px) {
+
+    .form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .cancel-btn,
+    .submit-btn {
+        width: 100%;
+    }
+
+    .monitor-options {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<!-- =====================================================
+     Dependencies
+     ===================================================== -->
+
+<script src="{% static 'vendor/jalalidatepicker/jalalidatepicker.min.js' %}"></script>
+
+
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+
+    /* =====================================================
+       تقویم شمسی
+       ===================================================== */
+
+    if (
+        typeof jalaliDatepicker !== "undefined"
+        && typeof jalaliDatepicker.startWatch === "function"
+    ) {
+
+        jalaliDatepicker.startWatch({
+            autoShow: true,
+            autoHide: true,
+            hideAfterChange: true,
+            showTodayBtn: true,
+            showEmptyBtn: true,
+        });
+
+    }
+
+
+    /* =====================================================
+       مدیریت فرم داروها
+       ===================================================== */
+
+    const addButton = document.getElementById(
+        "add-medication"
+    );
+
+    const formsContainer = document.getElementById(
+        "medication-forms"
+    );
+
+    const emptyFormContainer = document.getElementById(
+        "empty-medication-form"
+    );
+
+
+    /*
+        اگر بخش داروها در صفحه وجود نداشت،
+        اجرای JavaScript متوقف شود.
+    */
+
+    if (
+        !addButton
+        || !formsContainer
+        || !emptyFormContainer
+    ) {
+        return;
+    }
+
+
+    /* =====================================================
+       پیدا کردن TOTAL_FORMS
+       ===================================================== */
+
+    const totalForms = document.querySelector(
+        'input[name$="-TOTAL_FORMS"]'
+    );
+
+
+    if (!totalForms) {
+        return;
+    }
+
+
+    /* =====================================================
+       شماره‌گذاری داروها
+       ===================================================== */
+
+    function updateMedicationNumbers() {
+
+        const cards = formsContainer.querySelectorAll(
+            ".medication-form-card"
+        );
+
+        let visibleIndex = 1;
+
+
+        cards.forEach(function (card) {
+
+            /*
+                داروهای حذف‌شده شماره نمی‌گیرند.
+            */
+
+            if (card.classList.contains("deleted")) {
+                return;
+            }
+
+
+            const number = card.querySelector(
+                ".medication-index"
+            );
+
+            const title = card.querySelector(
+                ".medication-number strong"
+            );
+
+
+            if (number) {
+
+                number.textContent = visibleIndex;
+
+            }
+
+
+            if (title) {
+
+                title.textContent =
+                    "دارو " + visibleIndex;
+
+            }
+
+
+            visibleIndex++;
+
+        });
+
+    }
+
+
+    /* =====================================================
+       فعال کردن دکمه حذف
+       ===================================================== */
+
+    function setupDeleteButton(card) {
+
+        const deleteCheckbox = card.querySelector(
+            'input[type="checkbox"][name$="-DELETE"]'
+        );
+
+        const deleteButton = card.querySelector(
+            ".delete-medication"
+        );
+
+
+        if (
+            !deleteCheckbox
+            || !deleteButton
+        ) {
+            return;
+        }
+
+
+        /*
+            جلوگیری از ثبت دوباره event
+        */
+
+        if (
+            deleteCheckbox.dataset.ready === "true"
+        ) {
+            return;
+        }
+
+
+        deleteCheckbox.dataset.ready = "true";
+
+
+        /* =================================================
+           دکمه حذف
+           ================================================= */
+
+        deleteButton.addEventListener(
+            "click",
+            function () {
+
+                setTimeout(function () {
+
+                    if (deleteCheckbox.checked) {
+
+                        card.classList.add("deleted");
+
+                    } else {
+
+                        card.classList.remove("deleted");
+
+                    }
+
+                    updateMedicationNumbers();
+
+                }, 0);
+
+            }
+        );
+
+
+        /* =================================================
+           تغییر مستقیم Checkbox
+           ================================================= */
+
+        deleteCheckbox.addEventListener(
+            "change",
+            function () {
+
+                if (deleteCheckbox.checked) {
+
+                    card.classList.add("deleted");
+
+                } else {
+
+                    card.classList.remove("deleted");
+
+                }
+
+                updateMedicationNumbers();
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       فعال کردن دکمه حذف تمام داروهای موجود
+       ===================================================== */
+
+    function setupAllDeleteButtons() {
+
+        const cards = formsContainer.querySelectorAll(
+            ".medication-form-card"
+        );
+
+
+        cards.forEach(function (card) {
+
+            setupDeleteButton(card);
+
+        });
+
+    }
+
+
+    /* =====================================================
+       افزودن داروی جدید
+       ===================================================== */
+
+    addButton.addEventListener(
+        "click",
+        function () {
+
+            const formIndex = parseInt(
+                totalForms.value,
+                10
+            );
+
+
+            /*
+                Empty form جنگو
+            */
+
+            let formHTML =
+                emptyFormContainer.innerHTML;
+
+
+            /*
+                جایگزینی __prefix__
+                با شماره فرم جدید
+            */
+
+            formHTML = formHTML.replace(
+                /__prefix__/g,
+                formIndex
+            );
+
+
+            /*
+                اضافه کردن فرم جدید
+            */
+
+            formsContainer.insertAdjacentHTML(
+                "beforeend",
+                formHTML
+            );
+
+
+            /*
+                افزایش TOTAL_FORMS
+            */
+
+            totalForms.value =
+                formIndex + 1;
+
+
+            /*
+                پیدا کردن آخرین کارت
+            */
+
+            const cards =
+                formsContainer.querySelectorAll(
+                    ".medication-form-card"
+                );
+
+
+            const newCard =
+                cards[cards.length - 1];
+
+
+            /*
+                فعال کردن حذف برای داروی جدید
+            */
+
+            if (newCard) {
+
+                setupDeleteButton(newCard);
+
+            }
+
+
+            /*
+                به‌روزرسانی شماره داروها
+            */
+
+            updateMedicationNumbers();
+
+        }
+    );
+
+
+    /* =====================================================
+       اجرای اولیه
+       ===================================================== */
+
+    setupAllDeleteButtons();
+
+    updateMedicationNumbers();
+
+});
+
+</script>
+
+{% endblock %}

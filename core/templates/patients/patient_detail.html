@@ -1,0 +1,1353 @@
+{% extends "base.html" %}
+{% load patient_filters %}
+
+{% block title %}
+    پرونده بیمار | سامانه مدیریت بیماران
+{% endblock %}
+
+{% block content %}
+
+<div class="patient-detail-page">
+
+    <!-- Header -->
+    <div class="detail-header">
+
+        <div class="detail-header-info">
+
+            <a href="{% url 'patient-list' %}" class="back-link">
+                <i class="fa-solid fa-arrow-right"></i>
+                بازگشت به لیست بیماران
+            </a>
+
+            <div class="patient-title">
+
+                <div class="patient-avatar">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+
+                <div>
+                    <span class="page-eyebrow">
+                        <i class="fa-solid fa-folder-open"></i>
+                        پرونده بیمار
+                    </span>
+
+                    <h1>بیمار شماره {{ patient.id }}</h1>
+
+                    <p>
+                        ثبت شده در
+                        {{ patient.created_at|date:"Y/m/d" }}
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="detail-actions">
+
+            <a href="{% url 'patient-edit' patient.pk %}" class="btn btn-primary">
+                <i class="fa-solid fa-pen"></i>
+                ویرایش اطلاعات
+            </a>
+
+            <a href="{% url 'patient-delete' patient.pk %}" class="btn btn-danger">
+                <i class="fa-solid fa-trash"></i>
+                حذف پرونده
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- Overall Compliance -->
+    <div class="compliance-card">
+
+        <div class="compliance-icon">
+            <i class="fa-solid fa-shield-heart"></i>
+        </div>
+
+        <div class="compliance-content">
+
+            <span>وضعیت کلی پایش</span>
+
+            <strong>
+                {{ patient.get_overall_compliance }}
+            </strong>
+
+            <small>
+                بر اساس وضعیت هشت شاخص پایش درمان
+            </small>
+
+        </div>
+
+    </div>
+
+
+    <!-- Basic Information -->
+    <section class="detail-section">
+
+        <div class="section-title">
+
+            <div class="section-title-icon">
+                <i class="fa-solid fa-id-card"></i>
+            </div>
+
+            <div>
+                <h2>اطلاعات پایه</h2>
+                <p>مشخصات اصلی بیمار</p>
+            </div>
+
+        </div>
+
+
+        <div class="info-grid">
+
+            <div class="info-item">
+                <span class="info-label">سن</span>
+                <strong>{{ patient.age }} سال</strong>
+            </div>
+
+            <div class="info-item">
+                <span class="info-label">جنسیت</span>
+                <strong>{{ patient.get_gender_display }}</strong>
+            </div>
+
+            <div class="info-item info-item-wide">
+                <span class="info-label">تشخیص روان‌پزشکی</span>
+                <strong>{{ patient.psychiatric_diagnosis }}</strong>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- Comorbidities -->
+    <section class="detail-section">
+
+        <div class="section-title">
+
+            <div class="section-title-icon">
+                <i class="fa-solid fa-heart-pulse"></i>
+            </div>
+
+            <div>
+                <h2>بیماری‌های همراه</h2>
+                <p>وضعیت بیماری‌های متابولیک و قلبی عروقی</p>
+            </div>
+
+        </div>
+
+
+        <div class="condition-grid">
+
+            <div class="condition-item {% if patient.diabetes %}active{% endif %}">
+                <span class="condition-icon">
+                    <i class="fa-solid fa-droplet"></i>
+                </span>
+
+                <div>
+                    <strong>دیابت</strong>
+                    <small>
+                        {% if patient.diabetes %}
+                            دارد
+                        {% else %}
+                            ندارد
+                        {% endif %}
+                    </small>
+                </div>
+            </div>
+
+
+            <div class="condition-item {% if patient.hypertension %}active{% endif %}">
+                <span class="condition-icon">
+                    <i class="fa-solid fa-heart"></i>
+                </span>
+
+                <div>
+                    <strong>پرفشاری خون</strong>
+                    <small>
+                        {% if patient.hypertension %}
+                            دارد
+                        {% else %}
+                            ندارد
+                        {% endif %}
+                    </small>
+                </div>
+            </div>
+
+
+            <div class="condition-item {% if patient.dyslipidemia %}active{% endif %}">
+                <span class="condition-icon">
+                    <i class="fa-solid fa-chart-line"></i>
+                </span>
+
+                <div>
+                    <strong>دیس‌لیپیدمی</strong>
+                    <small>
+                        {% if patient.dyslipidemia %}
+                            دارد
+                        {% else %}
+                            ندارد
+                        {% endif %}
+                    </small>
+                </div>
+            </div>
+
+
+            <div class="condition-item {% if patient.obesity %}active{% endif %}">
+                <span class="condition-icon">
+                    <i class="fa-solid fa-weight-scale"></i>
+                </span>
+
+                <div>
+                    <strong>چاقی</strong>
+                    <small>
+                        {% if patient.obesity %}
+                            دارد
+                        {% else %}
+                            ندارد
+                        {% endif %}
+                    </small>
+                </div>
+            </div>
+
+
+            <div class="condition-item {% if patient.cardiovascular_disease %}active{% endif %}">
+                <span class="condition-icon">
+                    <i class="fa-solid fa-heart-circle-check"></i>
+                </span>
+
+                <div>
+                    <strong>بیماری قلبی عروقی</strong>
+                    <small>
+                        {% if patient.cardiovascular_disease %}
+                            دارد
+                        {% else %}
+                            ندارد
+                        {% endif %}
+                    </small>
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- Medications -->
+    <section class="detail-section">
+
+        <div class="section-title">
+
+            <div class="section-title-icon">
+                <i class="fa-solid fa-pills"></i>
+            </div>
+
+            <div>
+                <h2>داروهای مصرفی</h2>
+                <p>آنتی‌سایکوتیک‌های نسل دوم</p>
+            </div>
+
+        </div>
+
+
+        {% if patient.medications.exists %}
+
+            {% if patient.is_polypharmacy %}
+                <div class="polypharmacy-alert">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+
+                    <div>
+                        <strong>پلی‌فارماسی</strong>
+                        <span>
+                            بیمار بیش از یک آنتی‌سایکوتیک نسل دوم دریافت می‌کند.
+                        </span>
+                    </div>
+                </div>
+            {% endif %}
+
+
+            <div class="medication-list">
+
+                {% for medication in patient.medications.all %}
+
+                    <div class="medication-card">
+
+                        <div class="medication-icon">
+                            <i class="fa-solid fa-capsules"></i>
+                        </div>
+
+                        <div class="medication-info">
+
+                            <strong>
+                                {{ medication.get_drug_display }}
+                            </strong>
+
+                            <div class="medication-meta">
+
+                                <span>
+                                    <i class="fa-solid fa-prescription-bottle"></i>
+                                    {{ medication.dose }} میلی‌گرم
+                                </span>
+
+                                <span>
+                                    <i class="fa-solid fa-route"></i>
+                                    {{ medication.get_form_display }}
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="empty-section">
+                <i class="fa-solid fa-pills"></i>
+                <span>دارویی برای این بیمار ثبت نشده است.</span>
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+    <!-- Treatment Information -->
+    <section class="detail-section">
+
+        <div class="section-title">
+
+            <div class="section-title-icon">
+                <i class="fa-solid fa-calendar-check"></i>
+            </div>
+
+            <div>
+                <h2>اطلاعات درمان</h2>
+                <p>زمان شروع درمان و آخرین تغییر دارویی</p>
+            </div>
+
+        </div>
+
+
+        <div class="timeline-info">
+
+            <div class="timeline-item">
+
+                <div class="timeline-dot"></div>
+
+                <div class="timeline-content">
+
+                    <span>شروع درمان</span>
+
+                    <strong>
+                        {{ patient.treatment_start_date|jalali_date }}
+                    </strong>
+
+                    <small>
+                        مدت درمان:
+                        {{ patient.treatment_duration }}
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="timeline-line"></div>
+
+
+            <div class="timeline-item">
+
+                <div class="timeline-dot"></div>
+
+                <div class="timeline-content">
+
+                    <span>آخرین تغییر دارو یا دوز</span>
+
+                    <strong>
+                        {{ patient.last_medication_change|jalali_date }}
+                    </strong>
+
+                    <small>
+                        مدت زمان گذشته:
+                        {{ patient.medication_change_duration }}
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- Monitoring -->
+    <section class="detail-section monitoring-section">
+
+        <div class="section-title">
+
+            <div class="section-title-icon">
+                <i class="fa-solid fa-stethoscope"></i>
+            </div>
+
+            <div>
+                <h2>پایش درمان</h2>
+                <p>وضعیت پایش شاخص‌های بالینی</p>
+            </div>
+
+        </div>
+
+
+        <div class="monitoring-grid">
+
+
+            <!-- Weight -->
+            <div class="monitor-card">
+
+                <div class="monitor-header">
+
+                    <div class="monitor-icon">
+                        <i class="fa-solid fa-weight-scale"></i>
+                    </div>
+
+                    <div>
+                        <h3>وزن / BMI</h3>
+                        <span>پایش وزن و شاخص توده بدنی</span>
+                    </div>
+
+                </div>
+
+                <div class="monitor-status">
+                    <span class="status-label">وضعیت</span>
+
+                    <span class="status-badge status-{{ patient.get_weight_status }}">
+                        {{ patient.get_weight_status }}
+                    </span>
+                </div>
+
+            </div>
+
+
+            <!-- Waist -->
+            <div class="monitor-card">
+
+                <div class="monitor-header">
+
+                    <div class="monitor-icon">
+                        <i class="fa-solid fa-ruler-horizontal"></i>
+                    </div>
+
+                    <div>
+                        <h3>دور کمر</h3>
+                        <span>پایش دور کمر</span>
+                    </div>
+
+                </div>
+
+                <div class="monitor-status">
+                    <span class="status-label">وضعیت</span>
+
+                    <span class="status-badge status-{{ patient.get_waist_status }}">
+                        {{ patient.get_waist_status }}
+                    </span>
+                </div>
+
+            </div>
+
+
+            <!-- Blood Pressure -->
+            <div class="monitor-card">
+
+                <div class="monitor-header">
+
+                    <div class="monitor-icon">
+                        <i class="fa-solid fa-heart-pulse"></i>
+                    </div>
+
+                    <div>
+                        <h3>فشار خون / نبض</h3>
+                        <span>پایش فشار خون و ضربان قلب</span>
+                    </div>
+
+                </div>
+
+                <div class="monitor-status">
+                    <span class="status-label">وضعیت</span>
+
+                    <span class="status-badge status-{{ patient.get_blood_pressure_status }}">
+                        {{ patient.get_blood_pressure_status }}
+                    </span>
+                </div>
+
+            </div>
+
+
+            <!-- Glucose -->
+            <div class="monitor-card">
+
+                <div class="monitor-header">
+
+                    <div class="monitor-icon">
+                        <i class="fa-solid fa-vial"></i>
+                    </div>
+
+                    <div>
+                        <h3>قند خون / HbA1c</h3>
+                        <span>پایش قند خون</span>
+                    </div>
+
+                </div>
+
+                <div class="monitor-status">
+                    <span class="status-label">وضعیت</span>
+
+                    <span class="status-badge status-{{ patient.get_glucose_status }}">
+                        {{ patient.get_glucose_status }}
+                    </span>
+                </div>
+
+            </div>
+
+
+            <!-- Lipid -->
+            <div class="monitor-card">
+
+                <div class="monitor-header">
+
+                    <div class="monitor-icon">
+                        <i class="fa-solid fa-chart-column"></i>
+                    </div>
+
+                    <div>
+                        <h3>پروفایل لیپیدی</h3>
+                        <span>پایش چربی خون</span>
+                    </div>
+
+                </div>
+
+                <div class="monitor-status">
+                    <span class="status-label">وضعیت</span>
+
+                    <span class="status-badge status-{{ patient.get_lipid_status }}">
+                        {{ patient.get_lipid_status }}
+                    </span>
+                </div>
+
+            </div>
+
+
+            <!-- Prolactin -->
+            <div class="monitor-card">
+
+                <div class="monitor-header">
+
+                    <div class="monitor-icon">
+                        <i class="fa-solid fa-flask"></i>
+                    </div>
+
+                    <div>
+                        <h3>پرولاکتین</h3>
+                        <span>پایش سطح پرولاکتین</span>
+                    </div>
+
+                </div>
+
+                <div class="monitor-status">
+                    <span class="status-label">وضعیت</span>
+
+                    <span class="status-badge status-{{ patient.get_prolactin_status }}">
+                        {{ patient.get_prolactin_status }}
+                    </span>
+                </div>
+
+            </div>
+
+
+            <!-- Movement -->
+            <div class="monitor-card">
+
+                <div class="monitor-header">
+
+                    <div class="monitor-icon">
+                        <i class="fa-solid fa-person-walking"></i>
+                    </div>
+
+                    <div>
+                        <h3>اختلالات حرکتی</h3>
+                        <span>پایش اختلالات حرکتی</span>
+                    </div>
+
+                </div>
+
+                <div class="monitor-status">
+                    <span class="status-label">وضعیت</span>
+
+                    <span class="status-badge status-{{ patient.get_movement_status }}">
+                        {{ patient.get_movement_status }}
+                    </span>
+                </div>
+
+            </div>
+
+
+            <!-- ECG -->
+            <div class="monitor-card">
+
+                <div class="monitor-header">
+
+                    <div class="monitor-icon">
+                        <i class="fa-solid fa-wave-square"></i>
+                    </div>
+
+                    <div>
+                        <h3>ECG</h3>
+                        <span>الکتروکاردیوگرام</span>
+                    </div>
+
+                </div>
+
+                <div class="monitor-status">
+                    <span class="status-label">وضعیت</span>
+
+                    <span class="status-badge status-{{ patient.get_ecg_status }}">
+                        {{ patient.get_ecg_status }}
+                    </span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- Notes -->
+    {% if patient.notes %}
+
+    <section class="detail-section">
+
+        <div class="section-title">
+
+            <div class="section-title-icon">
+                <i class="fa-solid fa-note-sticky"></i>
+            </div>
+
+            <div>
+                <h2>توضیحات</h2>
+                <p>یادداشت‌های ثبت‌شده برای پرونده</p>
+            </div>
+
+        </div>
+
+        <div class="notes-box">
+            {{ patient.notes|linebreaksbr }}
+        </div>
+
+    </section>
+
+    {% endif %}
+
+
+    <!-- Bottom Actions -->
+    <div class="bottom-actions">
+
+        <a href="{% url 'patient-list' %}" class="secondary-action">
+            <i class="fa-solid fa-arrow-right"></i>
+            بازگشت به لیست
+        </a>
+
+        <div>
+
+            <a href="{% url 'patient-edit' patient.pk %}" class="btn btn-primary">
+                <i class="fa-solid fa-pen"></i>
+                ویرایش پرونده
+            </a>
+
+            <a href="{% url 'patient-delete' patient.pk %}" class="btn btn-danger">
+                <i class="fa-solid fa-trash"></i>
+                حذف پرونده
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+.patient-detail-page {
+    padding: 10px 0 50px;
+}
+
+
+/* Header */
+
+.detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 30px;
+    margin-bottom: 25px;
+}
+
+.detail-header-info {
+    flex: 1;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #777;
+    font-size: 13px;
+    margin-bottom: 20px;
+    transition: 0.2s;
+}
+
+.back-link:hover {
+    color: #6c4ab6;
+}
+
+.patient-title {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.patient-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #7b5bc4, #60409d);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    box-shadow: 0 10px 25px rgba(108, 74, 182, 0.2);
+}
+
+.page-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: #7652b5;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.patient-title h1 {
+    margin: 0;
+    font-size: 27px;
+    color: #292333;
+}
+
+.patient-title p {
+    margin: 5px 0 0;
+    color: #92909a;
+    font-size: 12px;
+}
+
+.detail-actions {
+    display: flex;
+    gap: 10px;
+}
+
+
+/* Buttons */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 10px;
+    padding: 11px 17px;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-primary {
+    background: #6c4ab6;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #593a9d;
+    transform: translateY(-1px);
+}
+
+.btn-danger {
+    background: #fff0f1;
+    color: #c54b58;
+}
+
+.btn-danger:hover {
+    background: #fbe0e3;
+}
+
+
+/* Compliance */
+
+.compliance-card {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 22px 25px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #f6f2fd, #fbfaff);
+    border: 1px solid #e8def8;
+    margin-bottom: 25px;
+}
+
+.compliance-icon {
+    width: 55px;
+    height: 55px;
+    flex-shrink: 0;
+    border-radius: 15px;
+    background: #e8def8;
+    color: #6947ad;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+}
+
+.compliance-content {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.compliance-content span {
+    font-size: 12px;
+    color: #817a8f;
+}
+
+.compliance-content strong {
+    font-size: 20px;
+    color: #5e409b;
+}
+
+.compliance-content small {
+    font-size: 11px;
+    color: #9994a3;
+}
+
+
+/* Sections */
+
+.detail-section {
+    background: white;
+    border: 1px solid #eeeaf4;
+    border-radius: 17px;
+    padding: 25px;
+    margin-bottom: 22px;
+    box-shadow: 0 4px 18px rgba(52, 39, 77, 0.035);
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    margin-bottom: 22px;
+}
+
+.section-title-icon {
+    width: 43px;
+    height: 43px;
+    border-radius: 12px;
+    background: #f2ecfb;
+    color: #6c4ab6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.section-title h2 {
+    margin: 0 0 3px;
+    color: #302b3b;
+    font-size: 17px;
+}
+
+.section-title p {
+    margin: 0;
+    color: #9a96a2;
+    font-size: 11px;
+}
+
+
+/* Basic Info */
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+}
+
+.info-item {
+    padding: 17px;
+    background: #faf9fc;
+    border: 1px solid #eeeaf3;
+    border-radius: 12px;
+}
+
+.info-item-wide {
+    grid-column: span 1;
+}
+
+.info-label {
+    display: block;
+    color: #96919e;
+    font-size: 11px;
+    margin-bottom: 7px;
+}
+
+.info-item strong {
+    color: #393341;
+    font-size: 14px;
+}
+
+
+/* Conditions */
+
+.condition-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+}
+
+.condition-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px;
+    border: 1px solid #eeeaf3;
+    background: #faf9fc;
+    border-radius: 12px;
+}
+
+.condition-icon {
+    width: 37px;
+    height: 37px;
+    flex-shrink: 0;
+    border-radius: 10px;
+    background: #f0edf4;
+    color: #aaa4b2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.condition-item.active {
+    background: #faf6ff;
+    border-color: #e4d8f6;
+}
+
+.condition-item.active .condition-icon {
+    background: #e8def8;
+    color: #704db3;
+}
+
+.condition-item strong {
+    display: block;
+    color: #48434f;
+    font-size: 12px;
+}
+
+.condition-item small {
+    display: block;
+    color: #9c98a4;
+    margin-top: 3px;
+    font-size: 10px;
+}
+
+
+/* Medications */
+
+.polypharmacy-alert {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: #fff8ec;
+    border: 1px solid #f4dfb9;
+    color: #9a6b20;
+    margin-bottom: 15px;
+}
+
+.polypharmacy-alert > i {
+    font-size: 20px;
+}
+
+.polypharmacy-alert strong,
+.polypharmacy-alert span {
+    display: block;
+}
+
+.polypharmacy-alert strong {
+    font-size: 13px;
+    margin-bottom: 3px;
+}
+
+.polypharmacy-alert span {
+    font-size: 11px;
+}
+
+.medication-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 13px;
+}
+
+.medication-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 17px;
+    border: 1px solid #eeeaf3;
+    border-radius: 13px;
+    background: #fcfbfd;
+}
+
+.medication-icon {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    background: #eee7fa;
+    color: #6c4ab6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.medication-info strong {
+    display: block;
+    color: #37313f;
+    font-size: 14px;
+    margin-bottom: 7px;
+}
+
+.medication-meta {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.medication-meta span {
+    color: #8f8998;
+    font-size: 11px;
+}
+
+.medication-meta i {
+    color: #8060bb;
+    margin-left: 4px;
+}
+
+
+/* Treatment */
+
+.timeline-info {
+    display: flex;
+    align-items: stretch;
+}
+
+.timeline-item {
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+    gap: 13px;
+}
+
+.timeline-dot {
+    width: 13px;
+    height: 13px;
+    margin-top: 5px;
+    border-radius: 50%;
+    background: #6c4ab6;
+    box-shadow: 0 0 0 5px #eee7fa;
+    flex-shrink: 0;
+}
+
+.timeline-content span,
+.timeline-content strong,
+.timeline-content small {
+    display: block;
+}
+
+.timeline-content span {
+    color: #96919e;
+    font-size: 11px;
+    margin-bottom: 5px;
+}
+
+.timeline-content strong {
+    color: #38323f;
+    font-size: 15px;
+}
+
+.timeline-content small {
+    color: #8e8997;
+    font-size: 11px;
+    margin-top: 6px;
+}
+
+.timeline-line {
+    width: 80px;
+    height: 1px;
+    background: #ded8e7;
+    margin: 11px 25px 0;
+}
+
+
+/* Monitoring */
+
+.monitoring-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+}
+
+.monitor-card {
+    border: 1px solid #eeeaf3;
+    border-radius: 14px;
+    padding: 17px;
+    background: #fcfbfd;
+}
+
+.monitor-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.monitor-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 11px;
+    background: #eee7fa;
+    color: #6c4ab6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.monitor-header h3 {
+    margin: 0 0 3px;
+    color: #3b3543;
+    font-size: 13px;
+}
+
+.monitor-header span {
+    color: #9a95a2;
+    font-size: 10px;
+}
+
+.monitor-status {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    padding-top: 12px;
+    border-top: 1px solid #eeeaf3;
+}
+
+.status-label {
+    color: #96919e;
+    font-size: 11px;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 90px;
+    padding: 6px 11px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+
+/* Status colors */
+
+.status-منطبق {
+    background: #e9f8f0;
+    color: #25815a;
+}
+
+.status-فاقد {
+    background: #f1eef5;
+    color: #77717f;
+}
+
+.status-نامنطبق {
+    background: #fff0f1;
+    color: #c34e59;
+}
+
+
+/* Notes */
+
+.notes-box {
+    padding: 18px;
+    background: #faf9fc;
+    border: 1px solid #eeeaf3;
+    border-radius: 12px;
+    color: #57515f;
+    font-size: 13px;
+    line-height: 2;
+}
+
+.empty-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 30px;
+    border-radius: 12px;
+    background: #faf9fc;
+    color: #9994a2;
+    font-size: 12px;
+}
+
+
+/* Bottom Actions */
+
+.bottom-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 28px;
+}
+
+.bottom-actions > div {
+    display: flex;
+    gap: 10px;
+}
+
+.secondary-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #77717f;
+    font-size: 12px;
+}
+
+.secondary-action:hover {
+    color: #6c4ab6;
+}
+
+
+/* Responsive */
+
+@media (max-width: 1000px) {
+
+    .condition-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .info-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+
+@media (max-width: 760px) {
+
+    .detail-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .detail-actions {
+        width: 100%;
+    }
+
+    .detail-actions .btn {
+        flex: 1;
+    }
+
+    .condition-grid,
+    .monitoring-grid,
+    .medication-list {
+        grid-template-columns: 1fr;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .timeline-info {
+        flex-direction: column;
+        gap: 25px;
+    }
+
+    .timeline-line {
+        width: 1px;
+        height: 25px;
+        margin: -10px 0 -10px 6px;
+    }
+
+    .bottom-actions {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .bottom-actions > div {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .secondary-action {
+        justify-content: center;
+    }
+
+}
+
+@media (max-width: 480px) {
+
+    .detail-section {
+        padding: 17px;
+    }
+
+    .patient-title h1 {
+        font-size: 22px;
+    }
+
+    .detail-actions {
+        flex-direction: column;
+    }
+
+    .bottom-actions > div {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+</style>
+
+{% endblock %}
