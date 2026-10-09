@@ -1,6 +1,8 @@
 from django.urls import path
 
 from .views import (
+    DatabaseBackupView,
+    DatabaseRestoreView,
     PatientBulkDeleteView,
     PatientCreateView,
     PatientDeleteView,
@@ -53,6 +55,16 @@ urlpatterns = [
         "<int:pk>/delete/",
         PatientDeleteView.as_view(),
         name="patient-delete",
+    ),
+    path(
+        "backup/",
+        DatabaseBackupView.as_view(),
+        name="database-backup"
+    ),
+    path(
+        "restore/",
+        DatabaseRestoreView.as_view(),
+        name="database-restore",
     ),
 
 ]

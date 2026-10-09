@@ -542,18 +542,45 @@ button {
     padding-top: 20px;
 }
 
+
 .alert {
     display: flex;
     align-items: center;
     gap: 10px;
-    background: #F0FDF4;
-    border: 1px solid #BBF7D0;
-    color: #15803D;
     border-radius: 10px;
     padding: 12px 16px;
     margin-bottom: 10px;
     font-size: 0.88rem;
 }
+
+/* Success: green */
+.alert-success {
+    background: #F0FDF4;
+    border: 1px solid #BBF7D0;
+    color: #15803D;
+}
+
+/* Error: red */
+.alert-danger {
+    background: #FEF2F2;
+    border: 1px solid #FECACA;
+    color: #B91C1C;
+}
+
+/* Warning: yellow */
+.alert-warning {
+    background: #FFFBEB;
+    border: 1px solid #FDE68A;
+    color: #92400E;
+}
+
+/* Info: blue */
+.alert-info {
+    background: #EFF6FF;
+    border: 1px solid #BFDBFE;
+    color: #1D4ED8;
+}
+
 
 
 /* =====================================================

@@ -72,6 +72,34 @@
                     حذف انتخاب‌شده‌ها
                 </button>
             </form>
+            
+            <form method="post" action="{% url 'database-backup' %}">
+                {% csrf_token %}
+                <button type="submit" class="header-action-btn btn btn-outline-primary">
+                    <i class="fa-solid fa-database"></i>
+                    تهیه نسخه پشتیبان
+                </button>
+            </form>
+            <form
+                method="post"
+                action="{% url 'database-restore' %}"
+                enctype="multipart/form-data"
+            >
+                {% csrf_token %}
+
+                <input
+                    type="file"
+                    name="backup_file"
+                    accept=".sql"
+                    required
+                >
+
+                <button type="submit" class="btn btn-outline-warning">
+                    <i class="header-action-btn fa-solid fa-rotate-left"></i>
+                    بررسی فایل بازیابی
+                </button>
+            </form>
+
 
         </div>
 

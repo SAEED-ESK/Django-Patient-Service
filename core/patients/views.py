@@ -2,6 +2,8 @@ from django.contrib import messages
 from django.db import transaction
 from django.shortcuts import redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponse
+from django.views import View
 from django.views.generic import (
     CreateView, ListView, DetailView,
     UpdateView, DeleteView)
@@ -9,7 +11,11 @@ from django.views.generic import (
 from .forms import PatientForm, PatientMedicationFormSet
 from .models import Patient
 from .exports import export_patients_to_excel
+from .services.backup import create_database_backup, restore_database_backup
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 class PatientCreateView(LoginRequiredMixin, CreateView):
 
@@ -236,10 +242,6 @@ class PatientDeleteView(LoginRequiredMixin, DeleteView):
 
         return super().form_valid(form)
 
-from django.contrib import messages
-from django.db import transaction
-from django.shortcuts import redirect
-from django.views.generic import View
 
 
 class PatientBulkDeleteView(LoginRequiredMixin, View):
@@ -288,3 +290,51 @@ class PatientExportView(PatientListView):
         return export_patients_to_excel(
             queryset
         )
+
+class DatabaseBackupView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        try:
+            filename, backup_content = create_database_backup()
+
+            response = HttpResponse(
+                backup_content,
+                content_type="application/sql",
+            )
+            response["Content-Disposition"] = (
+                f'attachment; filename="{filename}"'
+            )
+            response["Cache-Control"] = "no-store"
+            return response
+
+        except Exception:
+            logger.exception("Database backup failed.")
+            return HttpResponse(
+                "تهیه نسخه پشتیبان ناموفق بود. لطفاً گزارش برنامه را بررسی کنید.",
+                status=500,
+                content_type="text/plain; charset=utf-8",
+            )
+
+class DatabaseRestoreView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        uploaded_file = request.FILES.get("backup_file")
+
+        if not uploaded_file:
+            messages.error(request, "لطفاً فایل بکاپ را انتخاب کنید.")
+            return redirect("patient-list")
+
+        try:
+            restore_database_backup(uploaded_file)
+            messages.success(
+                request,
+                "بازیابی اطلاعات با موفقیت انجام شد.",
+            )
+        except ValueError as exc:
+            messages.error(request, str(exc))
+        except Exception:
+            logger.exception("Database restore validation failed.")
+            messages.error(
+                request,
+                "بازیابی ناموفق بود. گزارش برنامه را بررسی کنید.",
+            )
+
+        return redirect("patient-list")

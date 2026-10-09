@@ -144,10 +144,27 @@
         <div class="container messages-container">
 
             {% for message in messages %}
+                <div class="alert
+                    {% if 'danger' in message.tags %}
+                        alert-danger
+                    {% elif 'success' in message.tags %}
+                        alert-success
+                    {% elif 'warning' in message.tags %}
+                        alert-warning
+                    {% else %}
+                        alert-info
+                    {% endif %}
+                ">
 
-                <div class="alert">
-
-                    <i class="fa-solid fa-circle-check"></i>
+                    {% if 'danger' in message.tags %}
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                    {% elif 'success' in message.tags %}
+                        <i class="fa-solid fa-circle-check"></i>
+                    {% elif 'warning' in message.tags %}
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    {% else %}
+                        <i class="fa-solid fa-circle-info"></i>
+                    {% endif %}
 
                     <span>
                         {{ message }}
@@ -160,6 +177,7 @@
         </div>
 
     {% endif %}
+
 
 
     <!-- =====================================================
