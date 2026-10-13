@@ -1,6 +1,6 @@
 # Patient Management Service
 
-![Project Demo](docs/patient-service-demo.gif)
+![Project Demo](docs/patient-service-demo.mp4)
 
 A Django-based patient management system designed to help healthcare professionals register, organize, search, and manage patient records through a web interface.
 
